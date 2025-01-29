@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ThemesMenus</string>
+    <string name="title_activity_2">Activity2</string>
+    <string name="activity2">Activity 2</string>
+    <string name="activity3">Activity 3</string>
+    <string name="title_activity_3">Activity3</string>
+    <string name="go_back">Go Back</string>
+    <string name="go_to_3">Go to Activity 3</string>
+    <string name="go_to_2">Go to Activity 2</string>
+</resources>

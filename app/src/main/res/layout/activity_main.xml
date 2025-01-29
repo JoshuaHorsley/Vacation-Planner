@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.assignment1.MainActivity">
+
+<!--    layout_constraintBottom_toBottomOf=parent-->
+<!--    layout_constraintLeft_toLeftOf=parent-->
+<!--    layout_constraintRight_toRightOf=parent-->
+<!--    layout_constraintTop_toTopOf=parent-->
+    <TextView
+        android:id="@+id/textView"
+        style="@style/MyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    layout_constraintBottom_toBottomOf=parent-->
+<!--    layout_constraintEnd_toEndOf=parent-->
+<!--    layout_constraintStart_toStartOf=parent-->
+<!--    layout_constraintTop_toTopOf=parent-->
+<!--    layout_constraintVertical_bias=0.184-->
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="126dp"
+        android:layout_height="46dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:max="50"
+        android:progress="20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.2" />
+
+
+<!--    layout_constraintBottom_toBottomOf=parent-->
+<!--    layout_constraintEnd_toEndOf=parent-->
+<!--    layout_constraintHorizontal_bias=0.45-->
+<!--    layout_constraintStart_toStartOf=parent-->
+<!--    layout_constraintTop_toBottomOf=@+id/seekBar-->
+    <CheckBox
+        android:id="@+id/checkBox"
+        style="@style/MyCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="CheckBox"
+        app:layout_constraintBottom_toBottomOf ="parent"
+        app:layout_constraintEnd_toEndOf ="parent"
+        app:layout_constraintHorizontal_bias ="0.5"
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintStart_toStartOf ="parent"
+        app:layout_constraintTop_toBottomOf ="@id/seekBar" />
+
+
+<!--    layout_constraintBottom_toBottomOf=parent-->
+<!--    layout_constraintEnd_toEndOf=parent-->
+<!--    layout_constraintStart_toStartOf=parent-->
+<!--    layout_constraintTop_toBottomOf=@+id/textView-->
+<!--    layout_constraintVertical_bias=0.15-->
+<!--    textColor=-->
+    <Button
+        android:id="@+id/goTo2Button"
+        style="@style/MyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="10dp"
+        android:text="@string/go_to_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintVertical_bias="0.15" />
+
+
+<!--    layout_constraintStart_toStartOf=parent-->
+<!--    layout_constraintTop_toBottomOf=@+id/myLongButton-->
+    <Button
+        android:id="@+id/goTo3Button"
+        style="@style/MyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="156dp"
+        android:layout_marginTop="76dp"
+        android:text="@string/go_to_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/goTo2Button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!--    colorPrimary @color/colorPrimary-->
+<!--    colorPrimaryDark @color/colorPrimaryDark-->
+<!--    colorAccent @color/colorAccent-->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+<!--    android:textSize-->
+    <style name="MyCheckBox" parent="@style/MyTextView">
+        <item name="android:textSize">15sp</item>
+    </style>
+<!--    android:textSize-->
+<!--    android:textStyle-->
+    <style name="MyTextView">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+<!--    android:background-->
+    <style name="MyButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">#ABC123</item>
+    </style>
+</resources>
