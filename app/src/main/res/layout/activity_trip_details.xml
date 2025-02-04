@@ -1,33 +1,86 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/destinationInput"
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter destination" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_image"
+        android:contentDescription="Background image" />
 
-    <EditText
-        android:id="@+id/budgetInput"
+    <!-- Foreground Layout (Your Content) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
-        android:hint="Enter budget ($)" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp"
+        android:background="#80000000">  <!-- Optional: Dark overlay for readability -->
 
-    <Button
-        android:id="@+id/saveTripButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save Trip Details" />
+        <EditText
+            android:id="@+id/destinationInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter destination"
+            android:background="@drawable/edittext_background"
+            android:textAlignment="center"
+            android:layout_marginTop="10dp"
+            android:padding="10dp" />
 
-    <Button
-        android:id="@+id/goBackButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Go Back" />
+        <EditText
+            android:id="@+id/budgetInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Enter budget ($)"
+            android:background="@drawable/edittext_background"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:padding="10dp" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/departureDateInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select Departure Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:background="@drawable/edittext_background"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/returnDateInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select Return Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:background="@drawable/edittext_background"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:padding="10dp" />
+
+
+
+        <Button
+            android:id="@+id/saveTripButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Trip Details"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/goBackButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go Back"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
