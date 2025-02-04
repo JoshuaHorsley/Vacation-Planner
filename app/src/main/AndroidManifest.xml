@@ -23,9 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SecondActivity"
+        <activity android:name=".TripDetailsActivity"
             android:label="@string/activity2"/>
-        <activity android:name=".ThirdActivity"
+        <activity android:name=".PeopleActivity"
             android:label="@string/activity3"/>
 
     </application>

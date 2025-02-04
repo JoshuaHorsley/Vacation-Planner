@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.assignment1.ThirdActivity">
+    tools:context="com.example.assignment1.PeopleActivity">
 
 <!--    layout_constraintBottom_toBottomOf=parent-->
 <!--    layout_constraintEnd_toEndOf=parent-->
