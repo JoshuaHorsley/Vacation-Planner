@@ -1,51 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tripDetailsText"
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="No Trip Details yet"
-        android:textSize="18sp"
-        android:paddingBottom="16dp" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_image"
+        android:contentDescription="Background image" />
 
-    <EditText
-        android:id="@+id/personNameInput"
+    <!-- Foreground Layout (Your Content) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter person name"
-        android:inputType="text" />
+        android:layout_height="741dp"
+        android:layout_gravity="center"
+        android:background="#80000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/addPersonButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Person" />
+        <TextView
+            android:id="@+id/tripDetailsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="16dp"
+            android:text="No Trip Details yet"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/peopleListText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="People will be listed here"
-        android:textSize="16sp"
-        android:paddingTop="16dp" />
+        <EditText
+            android:id="@+id/personNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:gravity="center"
+            android:hint="Enter person name"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
 
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save People List"
-        android:layout_marginTop="8dp"/>
+        <Button
+            android:id="@+id/addPersonButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/teal_700"
+            android:text="Add Person"
+            android:textColor="@color/white" />
 
-    <Button
-        android:id="@+id/goBackButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Go Back"
-        android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/peopleListText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="People will be listed here"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/teal_700"
+            android:text="Save People List"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/goBackButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/sunset_red"
+            android:text="Go Back"
+            android:textColor="@color/white" />
+    </LinearLayout>
+    </FrameLayout>
