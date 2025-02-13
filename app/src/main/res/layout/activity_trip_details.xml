@@ -18,22 +18,35 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="20dp"
-        android:background="#80000000">  <!-- Optional: Dark overlay for readability -->
+        android:background="#80000000">
+
+        <EditText
+            android:id="@+id/tripNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:hint="Enter trip name"
+            android:background="@drawable/edittext_background"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            android:padding="10dp" />
 
         <EditText
             android:id="@+id/destinationInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="Enter destination"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:padding="10dp" />
 
         <EditText
             android:id="@+id/budgetInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:inputType="numberDecimal"
             android:hint="Enter budget ($)"
             android:background="@drawable/edittext_background"
@@ -45,6 +58,7 @@
             android:id="@+id/departureDateInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="Select Departure Date"
             android:focusable="false"
             android:clickable="true"
@@ -57,6 +71,7 @@
             android:id="@+id/returnDateInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:hint="Select Return Date"
             android:focusable="false"
             android:clickable="true"
@@ -72,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save Trip Details"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="140dp"/>
 
         <Button
             android:id="@+id/goBackButton"
