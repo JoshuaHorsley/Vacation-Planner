@@ -20,44 +20,23 @@
         android:background="#CCFFFFFF"
         android:layout_gravity="center">
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Trip Planner"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:paddingBottom="20dp"
-            android:textColor="@color/black"/>
-
-        <Button
-            android:id="@+id/goToTripDetailsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Enter Trip Details"
-            android:padding="10dp"
-            android:backgroundTint="@color/sunset_orange"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/goToPeopleButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Manage Travelers"
-            android:padding="10dp"
-            android:backgroundTint="@color/teal_700"
-            android:textColor="@color/white"
-            android:layout_marginTop="10dp"/>
-
         <Button
             android:id="@+id/goToSummaryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="View Summary"
             android:padding="10dp"
-            android:backgroundTint="@color/sunset_red"
             android:textColor="@color/white"
             android:layout_marginTop="10dp"/>
+        
+        <Button
+            android:id="@+id/clearCacheButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Cache"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"/>
+
     </LinearLayout>
 
 </FrameLayout>

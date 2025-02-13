@@ -1,25 +1,29 @@
 package com.example.assignment1;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import java.util.Calendar;
-
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
-
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
+
+        sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
+
         tripNameInput = findViewById(R.id.tripNameInput);
         destinationInput = findViewById(R.id.destinationInput);
         budgetInput = findViewById(R.id.budgetInput);
@@ -28,88 +32,93 @@ public class TripDetailsActivity extends ComponentActivity {
         Button saveTripButton = findViewById(R.id.saveTripButton);
         Button goBackButton = findViewById(R.id.goBackButton);
 
-        String msgFromMain = getIntent().getStringExtra("message");
-        Toast.makeText(this, msgFromMain, Toast.LENGTH_LONG).show();
+        loadSavedTrip();
 
-        // Handle departure date selection
-        departureDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker(departureDateInput);
-            }
-        });
+        departureDateInput.setOnClickListener(v -> showDatePicker(departureDateInput));
+        returnDateInput.setOnClickListener(v -> showDatePicker(returnDateInput));
 
-        // Handle return date selection
-        returnDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker(returnDateInput);
-            }
-        });
-
-        saveTripButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tripName = tripNameInput.getText().toString();
-                String destination = destinationInput.getText().toString();
-                String budget = budgetInput.getText().toString();
-                String departureDate = departureDateInput.getText().toString();
-                String returnDate = returnDateInput.getText().toString();
-
-                if (tripName.isEmpty() || destination.isEmpty() || budget.isEmpty() || departureDate.isEmpty() || returnDate.isEmpty()) {
-                    Toast.makeText(TripDetailsActivity.this, "Please enter all details", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Intent sendBack = new Intent();
-                sendBack.putExtra("returned_data", "Trip to " + destination +
-                        " with a budget of $" + budget +
-                        ", departing on " + departureDate +
-                        " and returning on " + returnDate);
-                setResult(RESULT_OK, sendBack);
-                finish();
-            }
-        });
-
-        goBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        saveTripButton.setOnClickListener(v -> saveTrip());
+        goBackButton.setOnClickListener(v -> finish());
     }
 
-    // Date Picker Dialog
     private void showDatePicker(final EditText dateInput) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (view, selectedYear, selectedMonth, selectedDay) -> {
-                    String selectedDate = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
-                    dateInput.setText(selectedDate);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
+            String selectedDate = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+            dateInput.setText(selectedDate);
+            validateDates();
+        }, year, month, day);
 
-                    // Validate departure and return dates
-                    if (dateInput == departureDateInput && !returnDateInput.getText().toString().isEmpty()) {
-                        Calendar departureCal = Calendar.getInstance();
-                        departureCal.set(selectedYear, selectedMonth, selectedDay);
-
-                        Calendar returnCal = Calendar.getInstance();
-                        String[] returnDateParts = returnDateInput.getText().toString().split("-");
-                        returnCal.set(Integer.parseInt(returnDateParts[0]), Integer.parseInt(returnDateParts[1]) - 1, Integer.parseInt(returnDateParts[2]));
-
-                        if (departureCal.after(returnCal)) {
-                            Toast.makeText(this, "Departure date must be before return date", Toast.LENGTH_SHORT).show();
-                            dateInput.setText("");
-                        }
-                    }
-                },
-                year, month, day
-        );
         datePickerDialog.show();
     }
 
+    private void validateDates() {
+        String departureDateStr = departureDateInput.getText().toString();
+        String returnDateStr = returnDateInput.getText().toString();
+
+        if (!departureDateStr.isEmpty() && !returnDateStr.isEmpty()) {
+            String[] depParts = departureDateStr.split("-");
+            String[] retParts = returnDateStr.split("-");
+
+            Calendar departureCal = Calendar.getInstance();
+            departureCal.set(Integer.parseInt(depParts[0]), Integer.parseInt(depParts[1]) - 1, Integer.parseInt(depParts[2]));
+
+            Calendar returnCal = Calendar.getInstance();
+            returnCal.set(Integer.parseInt(retParts[0]), Integer.parseInt(retParts[1]) - 1, Integer.parseInt(retParts[2]));
+
+            if (departureCal.after(returnCal)) {
+                Toast.makeText(this, "Departure date must be before return date", Toast.LENGTH_SHORT).show();
+                returnDateInput.setText("");
+            }
+        }
+    }
+
+    private void saveTrip() {
+        String tripName = tripNameInput.getText().toString();
+        String destination = destinationInput.getText().toString();
+        String budget = budgetInput.getText().toString();
+        String departureDate = departureDateInput.getText().toString();
+        String returnDate = returnDateInput.getText().toString();
+
+        if (tripName.isEmpty() || destination.isEmpty() || budget.isEmpty() || departureDate.isEmpty() || returnDate.isEmpty()) {
+            Toast.makeText(this, "Please enter all details", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create trip summary string
+        String tripSummary = "Trip: " + tripName + "\nDestination: " + destination +
+                "\nBudget: $" + budget + "\nDeparture: " + departureDate +
+                "\nReturn: " + returnDate;
+
+        // Save to SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("tripName", tripName);
+        editor.putString("destination", destination);
+        editor.putString("budget", budget);
+        editor.putString("departureDate", departureDate);
+        editor.putString("returnDate", returnDate);
+        editor.putString("trip_summary", tripSummary);  // Save summary here
+        editor.apply();
+
+        Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void loadSavedTrip() {
+        String tripName = sharedPreferences.getString("tripName", "");
+        String destination = sharedPreferences.getString("destination", "");
+        String budget = sharedPreferences.getString("budget", "");
+        String departureDate = sharedPreferences.getString("departureDate", "");
+        String returnDate = sharedPreferences.getString("returnDate", "");
+
+        tripNameInput.setText(tripName);
+        destinationInput.setText(destination);
+        budgetInput.setText(budget);
+        departureDateInput.setText(departureDate);
+        returnDateInput.setText(returnDate);
+    }
 }
