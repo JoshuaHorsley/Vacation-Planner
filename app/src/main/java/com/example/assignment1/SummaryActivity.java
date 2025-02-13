@@ -28,7 +28,7 @@ public class SummaryActivity extends ComponentActivity {
     }
 
     private void loadCashedOutTrips() {
-        SharedPreferences sharedPreferences = getSharedPreferences(CASHED_OUT_TRIPS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
         Map<String, ?> allTrips = sharedPreferences.getAll();
 
         if (allTrips.isEmpty()) {
@@ -43,4 +43,5 @@ public class SummaryActivity extends ComponentActivity {
 
         summaryTextView.setText(summaryBuilder.toString());
     }
+
 }

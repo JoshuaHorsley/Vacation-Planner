@@ -31,7 +31,6 @@ public class PeopleActivity extends ComponentActivity {
         saveButton = findViewById(R.id.saveButton);
         goBackButton = findViewById(R.id.goBackButton);
 
-        // Load trip details
         String tripDetails = sharedPreferences.getString("trip_summary", "No trip details available");
         tripDetailsText.setText(tripDetails);
 
@@ -44,31 +43,47 @@ public class PeopleActivity extends ComponentActivity {
 
             int peopleCount = Integer.parseInt(peopleCountStr);
             float tripCost = sharedPreferences.getFloat("trip_cost", 0);
-            float updatedCost = tripCost * peopleCount;
+            float days = sharedPreferences.getFloat("trip_days", 1); // Assuming trip_days is saved
+            float additionalCost = 50 * peopleCount * days;
+            float updatedCost = (tripCost * peopleCount) + additionalCost;
 
-            // Retrieve and update the trip summary
-            String tripSummary = sharedPreferences.getString("trip_summary", "No trip details available");
-            String updatedTripSummary = tripSummary + "\nPeople: " + peopleCount + "\nTotal Cost: $" + updatedCost;
-
-            // Save updated cost and summary
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt("people_count", peopleCount);
             editor.putFloat("updated_trip_cost", updatedCost);
-            editor.putString("trip_summary", updatedTripSummary);
             editor.apply();
 
-            // **Add to CashedOutTrips**
+            // Update trip summary
+            String updatedTripDetails = sharedPreferences.getString("trip_summary", "No trip details available")
+                    + "\nPeople: " + peopleCount + "\nTotal Cost: $" + updatedCost;
+
+            tripDetailsText.setText(updatedTripDetails);
+
+            // **Save to CashedOutTrips for SummaryActivity**
             SharedPreferences cashedOutTripsPrefs = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
             SharedPreferences.Editor cashOutEditor = cashedOutTripsPrefs.edit();
             String tripKey = "Trip_" + System.currentTimeMillis(); // Unique key
-            cashOutEditor.putString(tripKey, updatedTripSummary);
+            cashOutEditor.putString(tripKey, updatedTripDetails);
             cashOutEditor.apply();
 
-            Toast.makeText(this, "Trip saved & cashed out!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Trip updated & cashed out!", Toast.LENGTH_SHORT).show();
         });
 
 
-
         goBackButton.setOnClickListener(view -> finish());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resetPeopleActivity();
+    }
+
+    private void resetPeopleActivity() {
+        // Reset the input field
+        peopleCountInput.setText("");
+
+        // Reload the trip summary
+        String tripDetails = sharedPreferences.getString("trip_summary", "No trip details available");
+        tripDetailsText.setText(tripDetails);
     }
 }
