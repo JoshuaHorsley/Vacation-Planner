@@ -3,44 +3,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background Image -->
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/background_image"
-    android:contentDescription="Background image" />
+        android:contentDescription="Background image" />
 
-    <!-- Foreground Layout (Your Content) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="732dp"
-        android:layout_gravity="center"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
         android:background="#80000000"
         android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trip Summary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:paddingBottom="16dp" />
 
         <TextView
             android:id="@+id/summaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="10dp"
             android:text="Cashed Out Trips"
-            android:textColor="@color/white"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingBottom="10dp"
+            android:textColor="@color/white"
+            android:gravity="center" />
 
         <Button
             android:id="@+id/goBackButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Go Back"
+            android:padding="10dp"
             android:layout_marginTop="10dp"
             android:backgroundTint="@color/sunset_red"
-            android:padding="10dp"
-            android:text="Go Back"
             android:textColor="@color/white" />
     </LinearLayout>
-    </FrameLayout>
+</FrameLayout>
