@@ -11,4 +11,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="sunset_orange">#FF914D</color>
+    <color name="ocean_teal">#008B8B</color>
+    <color name="sunset_red">#D43F00</color>
 </resources>
