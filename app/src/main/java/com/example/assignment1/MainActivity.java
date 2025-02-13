@@ -12,7 +12,14 @@ import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-
+/*
+ * FILE         :   MainActivity.java
+ * PROJECT      :   PROG3150 – Assignment #1
+ * PROGRAMMER   :   Josh Horsley, Daimon Quin
+ * DESCRIPTION  :   This activity is the main menu with three buttons that open up the Trip Details,
+ *                  the Travelers, and the Summary page. It also holds a Clear Cashe button to
+ *                  reset the app information
+ */
 public class MainActivity extends ComponentActivity {
     private static final String TRIP_DATA = "TripData";
     private SharedPreferences sharedPreferences;

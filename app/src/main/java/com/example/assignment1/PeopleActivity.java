@@ -1,13 +1,11 @@
-package  com.example.assignment1;
-
+package com.example.assignment1;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +17,20 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
+ * FILE         :   PeopleActivity.java
+ * PROJECT      :   PROG3150 – Assignment #1
+ * PROGRAMMER   :   Josh Horsley, Daimon Quin
+ * DESCRIPTION  :   This page takes the trip created in TripDetailsActivity and allows the user to add
+ *                  people to the trip and indicate whether it is an adults only trip.
+ */
 public class PeopleActivity extends ComponentActivity {
     private static final String TRIP_DATA = "TripData";
     private SharedPreferences sharedPreferences;
     private TextView tripDetailsText, peopleListText;
     private EditText personNameInput;
     private Button addPersonButton, saveButton, goBackButton;
+    private Switch adultsOnlySwitch;
 
     private List<String> peopleList;
 
@@ -35,18 +40,21 @@ public class PeopleActivity extends ComponentActivity {
         setContentView(R.layout.people_activity);
 
         sharedPreferences = getSharedPreferences(TRIP_DATA, Context.MODE_PRIVATE);
+
         tripDetailsText = findViewById(R.id.tripDetailsText);
         personNameInput = findViewById(R.id.personNameInput);
         peopleListText = findViewById(R.id.peopleListText);
         addPersonButton = findViewById(R.id.addPersonButton);
         saveButton = findViewById(R.id.saveButton);
         goBackButton = findViewById(R.id.goBackButton);
+        adultsOnlySwitch = findViewById(R.id.adultsOnlySwitch);
 
-        // Load existing trip details and people list
         String tripDetails = sharedPreferences.getString("trip_summary", "No trip details available");
         tripDetailsText.setText(tripDetails);
 
-        loadPeopleList(); // Load saved people list
+        loadPeopleList();
+        boolean isAdultsOnly = sharedPreferences.getBoolean("adults_only", false);
+        adultsOnlySwitch.setChecked(isAdultsOnly);
 
         addPersonButton.setOnClickListener(view -> {
             String personName = personNameInput.getText().toString().trim();
@@ -55,16 +63,16 @@ public class PeopleActivity extends ComponentActivity {
                 return;
             }
 
-            // Add name to list
             peopleList.add(personName);
-            savePeopleList();  // Save updated list
-            updatePeopleListText();  // Update UI
+            savePeopleList();
+            updatePeopleListText();
 
-            // Clear input
             personNameInput.setText("");
             Toast.makeText(this, personName + " added to the trip!", Toast.LENGTH_SHORT).show();
         });
+
         saveButton.setOnClickListener(view -> savePeopleList());
+
         goBackButton.setOnClickListener(view -> finish());
     }
 
@@ -88,6 +96,7 @@ public class PeopleActivity extends ComponentActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         JSONArray jsonArray = new JSONArray(peopleList);
         editor.putString("people_list", jsonArray.toString());
+        editor.putBoolean("adults_only", adultsOnlySwitch.isChecked()); // Save switch state
         editor.apply();
         Toast.makeText(this, "People list saved!", Toast.LENGTH_SHORT).show();
     }

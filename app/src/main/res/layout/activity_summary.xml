@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,16 +10,22 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/background_image"
-        android:contentDescription="Background image" />
+        android:contentDescription="Background image"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
         android:background="#80000000"
         android:gravity="center"
-        android:layout_gravity="center">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/titleTextView"
@@ -42,6 +49,17 @@
             android:textColor="@color/white"
             android:gravity="center" />
 
+        <CheckBox
+            android:id="@+id/tripFinishedCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trip Finished"
+            android:textColor="@color/white"
+            android:buttonTint="@color/white"
+            android:layout_marginTop="16dp"/>
+
+
+
         <Button
             android:id="@+id/goBackButton"
             android:layout_width="match_parent"
@@ -52,4 +70,4 @@
             android:backgroundTint="@color/sunset_red"
             android:textColor="@color/white" />
     </LinearLayout>
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

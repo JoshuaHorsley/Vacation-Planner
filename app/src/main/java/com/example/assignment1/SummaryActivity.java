@@ -4,42 +4,59 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
+/*
+ * FILE         :   SummaryActivity.java
+ * PROJECT      :   PROG3150 – Assignment #1
+ * PROGRAMMER   :   Josh Horsley, Daimon Quin
+ * DESCRIPTION  :   This activity displays all information given by the two other activities.
+ */
 public class SummaryActivity extends ComponentActivity {
     private TextView summaryTextView;
     private Button goBackButton;
+    private CheckBox tripFinishedCheckBox;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
 
-        // Initialize views
+        sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
+
         summaryTextView = findViewById(R.id.summaryTextView);
         goBackButton = findViewById(R.id.goBackButton);
+        tripFinishedCheckBox = findViewById(R.id.tripFinishedCheckBox);
 
-        // Load and display trip and people details
         loadTripAndPeopleDetails();
 
-        // Set up the "Go Back" button to finish the activity
+        boolean isTripFinished = sharedPreferences.getBoolean("trip_finished", false);
+        tripFinishedCheckBox.setChecked(isTripFinished);
+
+        tripFinishedCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("trip_finished", isChecked);
+            editor.apply();
+            Toast.makeText(this, "Trip status updated!", Toast.LENGTH_SHORT).show();
+        });
+
         goBackButton.setOnClickListener(v -> finish());
     }
 
     private void loadTripAndPeopleDetails() {
-        // Access SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
-
-        // Load trip details
         String tripSummary = sharedPreferences.getString("trip_summary", "No trip details available");
 
-        // Load people list
+        boolean isAdultsOnly = sharedPreferences.getBoolean("adults_only", false);
+        String adultsOnlyText = isAdultsOnly ? "\n\nAdults-Only trip" : "\n\nFamily-friendly trip.";
+
         String peopleJson = sharedPreferences.getString("people_list", "[]");
         StringBuilder peopleDetails = new StringBuilder();
 
@@ -52,10 +69,8 @@ public class SummaryActivity extends ComponentActivity {
             e.printStackTrace();
         }
 
-        // Combine trip details and people list into a single summary
-        String summaryText = tripSummary + "\n\nPeople:\n" + peopleDetails.toString();
+        String summaryText = tripSummary + adultsOnlyText + "\n\nPeople:\n" + peopleDetails.toString();
 
-        // Display the summary in the TextView
         summaryTextView.setText(summaryText);
     }
 }

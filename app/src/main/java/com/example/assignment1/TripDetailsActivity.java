@@ -12,7 +12,13 @@ import android.widget.Toast;
 import java.util.Calendar;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
-
+/*
+ * FILE         :   TripDetailsActivity.java
+ * PROJECT      :   PROG3150 – Assignment #1
+ * PROGRAMMER   :   Josh Horsley, Daimon Quin
+ * DESCRIPTION  :   This activity allows the user to input all the information for their trip.
+ *                  This information is then passed to other activities to use and add to.
+ */
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
     private SharedPreferences sharedPreferences;
@@ -89,19 +95,17 @@ public class TripDetailsActivity extends ComponentActivity {
             return;
         }
 
-        // Create trip summary string
         String tripSummary = "Trip: " + tripName + "\nDestination: " + destination +
                 "\nBudget: $" + budget + "\nDeparture: " + departureDate +
                 "\nReturn: " + returnDate;
 
-        // Save to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("tripName", tripName);
         editor.putString("destination", destination);
         editor.putString("budget", budget);
         editor.putString("departureDate", departureDate);
         editor.putString("returnDate", returnDate);
-        editor.putString("trip_summary", tripSummary);  // Save summary here
+        editor.putString("trip_summary", tripSummary);
         editor.apply();
 
         Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();

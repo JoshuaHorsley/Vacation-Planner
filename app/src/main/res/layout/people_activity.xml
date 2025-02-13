@@ -63,6 +63,15 @@
             android:textColor="@color/white"
             android:textSize="16sp" />
 
+        <Switch
+            android:id="@+id/adultsOnlySwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Adults Only"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/white"/>
+
+
         <Button
             android:id="@+id/saveButton"
             android:layout_width="match_parent"
@@ -81,4 +90,4 @@
             android:text="Go Back"
             android:textColor="@color/white" />
     </LinearLayout>
-    </FrameLayout>
+</FrameLayout>
