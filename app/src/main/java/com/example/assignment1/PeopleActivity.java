@@ -13,6 +13,10 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 public class PeopleActivity extends ComponentActivity {
     private static final String TRIP_DATA = "TripData";
     private SharedPreferences sharedPreferences;
@@ -43,30 +47,55 @@ public class PeopleActivity extends ComponentActivity {
 
             int peopleCount = Integer.parseInt(peopleCountStr);
             float tripCost = sharedPreferences.getFloat("trip_cost", 0);
-            float days = sharedPreferences.getFloat("trip_days", 1); // Assuming trip_days is saved
-            float additionalCost = 50 * peopleCount * days;
-            float updatedCost = (tripCost * peopleCount) + additionalCost;
+            String departureDateStr = sharedPreferences.getString("departureDate", "");
+            String returnDateStr = sharedPreferences.getString("returnDate", "");
 
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("people_count", peopleCount);
-            editor.putFloat("updated_trip_cost", updatedCost);
-            editor.apply();
+            if (departureDateStr.isEmpty() || returnDateStr.isEmpty()) {
+                Toast.makeText(this, "Invalid trip dates", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            // Update trip summary
-            String updatedTripDetails = sharedPreferences.getString("trip_summary", "No trip details available")
-                    + "\nPeople: " + peopleCount + "\nTotal Cost: $" + updatedCost;
+            try {
+                // Attempt parsing with flexible handling of single-digit months and days
+                DateTimeFormatter flexibleFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+                DateTimeFormatter strictFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-            tripDetailsText.setText(updatedTripDetails);
+                LocalDate departureDate;
+                LocalDate returnDate;
 
-            // **Save to CashedOutTrips for SummaryActivity**
-            SharedPreferences cashedOutTripsPrefs = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
-            SharedPreferences.Editor cashOutEditor = cashedOutTripsPrefs.edit();
-            String tripKey = "Trip_" + System.currentTimeMillis(); // Unique key
-            cashOutEditor.putString(tripKey, updatedTripDetails);
-            cashOutEditor.apply();
+                // Try parsing with flexible format first
+                try {
+                    departureDate = LocalDate.parse(departureDateStr, flexibleFormatter);
+                    returnDate = LocalDate.parse(returnDateStr, flexibleFormatter);
+                } catch (Exception e) {
+                    // Fallback to strict format if flexible parsing fails
+                    departureDate = LocalDate.parse(departureDateStr, strictFormatter);
+                    returnDate = LocalDate.parse(returnDateStr, strictFormatter);
+                }
 
-            Toast.makeText(this, "Trip updated & cashed out!", Toast.LENGTH_SHORT).show();
+                long days = ChronoUnit.DAYS.between(departureDate, returnDate);
+                if (days < 1) days = 1; // Ensure at least 1 day
+
+                float additionalCost = 50 * peopleCount * days;
+                float updatedCost = additionalCost; // Removed the tripCost multiplication
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("people_count", peopleCount);
+                editor.putFloat("updated_trip_cost", updatedCost);
+                editor.apply();
+
+                // Update displayed trip details
+                String updatedTripDetails = tripDetails + "\nPeople: " + peopleCount + "\nTotal Cost: $" + updatedCost;
+                tripDetailsText.setText(updatedTripDetails);
+
+                Toast.makeText(this, "Trip updated with total cost including extra $50 per day per person!", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Error parsing trip dates!", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         });
+
+
 
 
         goBackButton.setOnClickListener(view -> finish());
