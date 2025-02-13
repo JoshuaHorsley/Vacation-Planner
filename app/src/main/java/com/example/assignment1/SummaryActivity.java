@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
-import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class SummaryActivity extends ComponentActivity {
-    private static final String CASHED_OUT_TRIPS = "CashedOutTrips";
     private TextView summaryTextView;
     private Button goBackButton;
 
@@ -19,29 +21,41 @@ public class SummaryActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
 
+        // Initialize views
         summaryTextView = findViewById(R.id.summaryTextView);
         goBackButton = findViewById(R.id.goBackButton);
 
-        loadCashedOutTrips();
+        // Load and display trip and people details
+        loadTripAndPeopleDetails();
 
+        // Set up the "Go Back" button to finish the activity
         goBackButton.setOnClickListener(v -> finish());
     }
 
-    private void loadCashedOutTrips() {
-        SharedPreferences sharedPreferences = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
-        Map<String, ?> allTrips = sharedPreferences.getAll();
+    private void loadTripAndPeopleDetails() {
+        // Access SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
 
-        if (allTrips.isEmpty()) {
-            summaryTextView.setText("No cashed-out trips available.");
-            return;
+        // Load trip details
+        String tripSummary = sharedPreferences.getString("trip_summary", "No trip details available");
+
+        // Load people list
+        String peopleJson = sharedPreferences.getString("people_list", "[]");
+        StringBuilder peopleDetails = new StringBuilder();
+
+        try {
+            JSONArray jsonArray = new JSONArray(peopleJson);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                peopleDetails.append("- ").append(jsonArray.getString(i)).append("\n");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        StringBuilder summaryBuilder = new StringBuilder();
-        for (Map.Entry<String, ?> entry : allTrips.entrySet()) {
-            summaryBuilder.append(entry.getValue().toString()).append("\n\n");
-        }
+        // Combine trip details and people list into a single summary
+        String summaryText = tripSummary + "\n\nPeople:\n" + peopleDetails.toString();
 
-        summaryTextView.setText(summaryBuilder.toString());
+        // Display the summary in the TextView
+        summaryTextView.setText(summaryText);
     }
-
 }

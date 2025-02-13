@@ -52,7 +52,7 @@ public class MainActivity extends ComponentActivity {
 
         Button clearCacheButton = findViewById(R.id.clearCacheButton);
         clearCacheButton.setOnClickListener(view -> {
-            SharedPreferences tripData = getSharedPreferences(TRIP_DATA, Context.MODE_PRIVATE);
+            SharedPreferences tripData = getSharedPreferences("TripData", Context.MODE_PRIVATE);
             SharedPreferences cashedOutTrips = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
 
             tripData.edit().clear().apply();

@@ -9,22 +9,37 @@
         android:id="@+id/tripDetailsText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Trip details will be shown here"
+        android:text="No Trip Details yet"
         android:textSize="18sp"
         android:paddingBottom="16dp" />
 
     <EditText
-        android:id="@+id/peopleCountInput"
+        android:id="@+id/personNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter number of people"
-        android:inputType="number" />
+        android:hint="Enter person name"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/addPersonButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Person" />
+
+    <TextView
+        android:id="@+id/peopleListText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="People will be listed here"
+        android:textSize="16sp"
+        android:paddingTop="16dp" />
 
     <Button
         android:id="@+id/saveButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save" />
+        android:text="Save People List"
+        android:layout_marginTop="8dp"/>
 
     <Button
         android:id="@+id/goBackButton"
