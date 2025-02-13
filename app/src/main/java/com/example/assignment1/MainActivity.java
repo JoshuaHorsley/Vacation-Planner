@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResult;
@@ -16,6 +17,9 @@ import androidx.annotation.Nullable;
 
 public class MainActivity extends ComponentActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private String tripSummary = "No trip details available";
+
+    private static final String PLANNED_TRIPS = "PlannedTrips";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,15 +31,11 @@ public class MainActivity extends ComponentActivity {
         Button goToSummaryButton = findViewById(R.id.goToSummaryButton);
 
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                            Intent receivedData = result.getData();
-                            String dataReceived = receivedData.getStringExtra("returned_data");
-                            Log.d(TAG, "Data received: " + dataReceived);
-                            Toast.makeText(MainActivity.this, "Updated: " + dataReceived, Toast.LENGTH_LONG).show();
-                        }
+                new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent receivedData = result.getData();
+                        tripSummary = receivedData.getStringExtra("returned_data");
+                        Toast.makeText(MainActivity.this, "Updated: " + tripSummary, Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -55,8 +55,8 @@ public class MainActivity extends ComponentActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, PeopleActivity.class);
-                intent.putExtra("message", "Manage Travelers");
-//                activityResultLauncher.launch(intent);
+                intent.putExtra("data_from_main_to_3", tripSummary);  // Pass trip summary
+                startActivity(intent);
             }
         });
 
