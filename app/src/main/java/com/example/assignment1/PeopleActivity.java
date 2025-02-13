@@ -15,7 +15,7 @@ public class PeopleActivity extends ComponentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_3);
+        setContentView(R.layout.people_activity);
         goBack = findViewById(R.id.goBack3);
 
 
