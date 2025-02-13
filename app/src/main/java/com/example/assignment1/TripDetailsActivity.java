@@ -89,16 +89,24 @@ public class TripDetailsActivity extends ComponentActivity {
             return;
         }
 
+        // Create trip summary string
+        String tripSummary = "Trip: " + tripName + "\nDestination: " + destination +
+                "\nBudget: $" + budget + "\nDeparture: " + departureDate +
+                "\nReturn: " + returnDate;
+
+        // Save to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("tripName", tripName);
         editor.putString("destination", destination);
         editor.putString("budget", budget);
         editor.putString("departureDate", departureDate);
         editor.putString("returnDate", returnDate);
+        editor.putString("trip_summary", tripSummary);  // Save summary here
         editor.apply();
 
         Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
     }
+
 
     private void loadSavedTrip() {
         String tripName = sharedPreferences.getString("tripName", "");
