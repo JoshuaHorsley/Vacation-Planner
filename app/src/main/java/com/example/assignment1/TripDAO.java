@@ -12,6 +12,10 @@ public class TripDAO {
     private SQLiteDatabase database;
     private DatabaseHelper dbHelper;
 
+    public boolean isOpen() {
+        return database != null && database.isOpen();
+    }
+
     public TripDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
     }

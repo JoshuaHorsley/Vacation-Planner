@@ -25,6 +25,7 @@ public class TripDetailsActivity extends ComponentActivity {
         setContentView(R.layout.activity_trip_details);
 
         tripDAO = new TripDAO(this);
+        tripDAO.open(); // Open the database when activity is created
 
         tripNameInput = findViewById(R.id.tripNameInput);
         destinationInput = findViewById(R.id.destinationInput);
@@ -93,14 +94,27 @@ public class TripDetailsActivity extends ComponentActivity {
 
         TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
 
-        if (currentTrip == null) {
-            tripDAO.addTrip(trip);
-            Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
-        } else {
+        // Make sure the database is open before operations
+        if (!tripDAO.isOpen()) {
+            tripDAO.open();
+        }
+
+        if (currentTrip != null) {
             trip.setId(currentTrip.getId());
             tripDAO.updateTrip(trip);
             Toast.makeText(this, "Trip updated successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            long newTripId = tripDAO.addTrip(trip);
+            if (newTripId > 0) {
+                Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed to save trip", Toast.LENGTH_SHORT).show();
+            }
         }
+
+        // Set the result to indicate success and pass back any needed data
+        Intent resultIntent = new Intent();
+        setResult(RESULT_OK, resultIntent);
 
         finish();
     }
@@ -118,6 +132,15 @@ public class TripDetailsActivity extends ComponentActivity {
                 departureDateInput.setText(currentTrip.getDepartureDate());
                 returnDateInput.setText(currentTrip.getReturnDate());
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Close database when activity is destroyed
+        if (tripDAO != null) {
+            tripDAO.close();
         }
     }
 }

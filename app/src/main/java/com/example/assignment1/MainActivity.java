@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import java.util.List;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -41,8 +42,21 @@ public class MainActivity extends ComponentActivity {
         });
 
         goToPeopleButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, PeopleActivity.class);
-            startActivity(intent);
+            TripDAO tripDAO = new TripDAO(MainActivity.this);
+            tripDAO.open();
+
+            // Fetch the first available trip (or show a message if no trips exist)
+            List<TripModel> trips = tripDAO.getAllTrips();
+            tripDAO.close();
+
+            if (trips.isEmpty()) {
+                Toast.makeText(MainActivity.this, "No trips found. Create a trip first!", Toast.LENGTH_LONG).show();
+            } else {
+                TripModel selectedTrip = trips.get(0); // For now, pick the first trip (you can add a trip selector later)
+                Intent intent = new Intent(MainActivity.this, PeopleActivity.class);
+                intent.putExtra("tripId", selectedTrip.getId()); // Pass the trip ID
+                startActivity(intent);
+            }
         });
 
         goToSummaryButton.setOnClickListener(view -> {
