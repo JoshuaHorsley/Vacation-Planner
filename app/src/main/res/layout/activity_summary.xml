@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Background Image -->
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -11,6 +12,7 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
+    <!-- Foreground Layout (Your Content) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,45 +22,38 @@
         android:gravity="center"
         android:layout_gravity="center">
 
-
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Trip Summary"
+            android:text="Your Trips"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
             android:textColor="@color/white"
             android:paddingBottom="16dp" />
 
-        <Spinner
-            android:id="@+id/tripSpinner"
+        <!-- ListView for trips -->
+        <ListView
+            android:id="@+id/tripsListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/spinner_background"
-            android:padding="10dp"
-            android:popupBackground="#FFFFFF" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="#66FFFFFF"
+            android:dividerHeight="1dp"
+            android:background="#40000000" />
 
+        <!-- Text shown when no trips available -->
         <TextView
-            android:id="@+id/summaryTextView"
+            android:id="@+id/noTripsTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cashed Out Trips"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="No trips available"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingBottom="10dp"
             android:textColor="@color/white"
-            android:gravity="center" />
-
-        <Button
-            android:id="@+id/saveToFileButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Trip Details"
-            android:layout_marginTop="16dp" />
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/goBackButton"

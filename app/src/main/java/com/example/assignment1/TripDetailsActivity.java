@@ -1,23 +1,34 @@
 package com.example.assignment1;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
+    private Button saveTripButton, goBackButton, newTripButton;
+    private Spinner tripSpinner;
+
     private TripDAO tripDAO;
     private TripModel currentTrip;
+    private Map<String, Long> tripNameToIdMap;
+    private boolean isEditMode = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,23 +36,95 @@ public class TripDetailsActivity extends ComponentActivity {
         setContentView(R.layout.activity_trip_details);
 
         tripDAO = new TripDAO(this);
-        tripDAO.open(); // Open the database when activity is created
+        tripDAO.open();
 
+        // Initialize views
+        tripSpinner = findViewById(R.id.tripSpinner);
         tripNameInput = findViewById(R.id.tripNameInput);
         destinationInput = findViewById(R.id.destinationInput);
         budgetInput = findViewById(R.id.budgetInput);
         departureDateInput = findViewById(R.id.departureDateInput);
         returnDateInput = findViewById(R.id.returnDateInput);
-        Button saveTripButton = findViewById(R.id.saveTripButton);
-        Button goBackButton = findViewById(R.id.goBackButton);
+        saveTripButton = findViewById(R.id.saveTripButton);
+        goBackButton = findViewById(R.id.goBackButton);
+        newTripButton = findViewById(R.id.newTripButton);
 
-        loadSavedTrip();
-
+        // Set up date pickers
         departureDateInput.setOnClickListener(v -> showDatePicker(departureDateInput));
         returnDateInput.setOnClickListener(v -> showDatePicker(returnDateInput));
 
+        // Load trips into the spinner
+        loadTripsIntoSpinner();
+
+        // New Trip button to clear form
+        newTripButton.setOnClickListener(v -> {
+            clearForm();
+            isEditMode = false;
+            saveTripButton.setText("Save Trip");
+            tripSpinner.setSelection(0); // Select "Create New Trip"
+        });
+
+        // Set up button click listeners
         saveTripButton.setOnClickListener(v -> saveTrip());
         goBackButton.setOnClickListener(v -> finish());
+
+        // Process intent for trip editing
+        Intent intent = getIntent();
+        long tripId = intent.getLongExtra("tripId", -1);
+        if (tripId != -1) {
+            loadTripForEditing(tripId);
+        }
+    }
+
+    private void loadTripsIntoSpinner() {
+        // Get all trips from the database
+        List<TripModel> tripList = tripDAO.getAllTrips();
+        tripNameToIdMap = new HashMap<>();
+
+        // Create a list for the spinner with a prompt as the first item
+        List<String> tripNames = new ArrayList<>();
+        tripNames.add("Create New Trip");
+
+        // Add trip names to the list and map them to their IDs
+        for (TripModel trip : tripList) {
+            String tripName = trip.getTripName();
+            tripNames.add(tripName);
+            tripNameToIdMap.put(tripName, trip.getId());
+        }
+
+        // Create an adapter for the spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                tripNames
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Set the adapter to the spinner
+        tripSpinner.setAdapter(adapter);
+
+        // Set up spinner selection listener
+        tripSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    // "Create New Trip" selected
+                    clearForm();
+                    isEditMode = false;
+                    saveTripButton.setText("Save Trip");
+                } else {
+                    // Existing trip selected
+                    String selectedTripName = parent.getItemAtPosition(position).toString();
+                    long tripId = tripNameToIdMap.get(selectedTripName);
+                    loadTripForEditing(tripId);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
 
     private void showDatePicker(final EditText dateInput) {
@@ -80,6 +163,38 @@ public class TripDetailsActivity extends ComponentActivity {
         }
     }
 
+    private void loadTripForEditing(long tripId) {
+        currentTrip = tripDAO.getTripById((int) tripId);
+        if (currentTrip != null) {
+            tripNameInput.setText(currentTrip.getTripName());
+            destinationInput.setText(currentTrip.getDestination());
+            budgetInput.setText(currentTrip.getBudget());
+            departureDateInput.setText(currentTrip.getDepartureDate());
+            returnDateInput.setText(currentTrip.getReturnDate());
+
+            isEditMode = true;
+            saveTripButton.setText("Update Trip");
+
+            // Pre-select this trip in the spinner
+            for (int i = 1; i < tripSpinner.getAdapter().getCount(); i++) {
+                String tripName = tripSpinner.getAdapter().getItem(i).toString();
+                if (tripNameToIdMap.get(tripName) == tripId) {
+                    tripSpinner.setSelection(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void clearForm() {
+        tripNameInput.setText("");
+        destinationInput.setText("");
+        budgetInput.setText("");
+        departureDateInput.setText("");
+        returnDateInput.setText("");
+        currentTrip = null;
+    }
+
     private void saveTrip() {
         String tripName = tripNameInput.getText().toString();
         String destination = destinationInput.getText().toString();
@@ -94,12 +209,12 @@ public class TripDetailsActivity extends ComponentActivity {
 
         TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
 
-        // Make sure the database is open before operations
+        // Make sure the database is open
         if (!tripDAO.isOpen()) {
             tripDAO.open();
         }
 
-        if (currentTrip != null) {
+        if (isEditMode && currentTrip != null) {
             trip.setId(currentTrip.getId());
             tripDAO.updateTrip(trip);
             Toast.makeText(this, "Trip updated successfully", Toast.LENGTH_SHORT).show();
@@ -107,38 +222,43 @@ public class TripDetailsActivity extends ComponentActivity {
             long newTripId = tripDAO.addTrip(trip);
             if (newTripId > 0) {
                 Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+                trip.setId(newTripId);
+                currentTrip = trip;
+                isEditMode = true;
+                saveTripButton.setText("Update Trip");
+
+                // Refresh spinner with the new trip
+                loadTripsIntoSpinner();
+
+                // Select the newly created trip
+                for (int i = 1; i < tripSpinner.getAdapter().getCount(); i++) {
+                    String name = tripSpinner.getAdapter().getItem(i).toString();
+                    if (name.equals(tripName)) {
+                        tripSpinner.setSelection(i);
+                        break;
+                    }
+                }
             } else {
                 Toast.makeText(this, "Failed to save trip", Toast.LENGTH_SHORT).show();
             }
         }
 
-        // Set the result to indicate success and pass back any needed data
+        // Set the result to indicate success
         Intent resultIntent = new Intent();
         setResult(RESULT_OK, resultIntent);
-
-        finish();
     }
 
-    private void loadSavedTrip() {
-        Intent intent = getIntent();
-        int tripId = intent.getIntExtra("tripId", -1);
-
-        if (tripId != -1) {
-            currentTrip = tripDAO.getTripById(tripId);
-            if (currentTrip != null) {
-                tripNameInput.setText(currentTrip.getTripName());
-                destinationInput.setText(currentTrip.getDestination());
-                budgetInput.setText(currentTrip.getBudget());
-                departureDateInput.setText(currentTrip.getDepartureDate());
-                returnDateInput.setText(currentTrip.getReturnDate());
-            }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tripDAO != null && !tripDAO.isOpen()) {
+            tripDAO.open();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Close database when activity is destroyed
         if (tripDAO != null) {
             tripDAO.close();
         }

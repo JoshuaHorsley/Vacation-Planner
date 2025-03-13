@@ -54,7 +54,7 @@
             android:id="@+id/goToSummaryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Summary"
+            android:text="View Trips"
             android:padding="10dp"
             android:backgroundTint="@color/sunset_red"
             android:textColor="@color/white"

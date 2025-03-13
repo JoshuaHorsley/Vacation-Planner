@@ -20,6 +20,24 @@
         android:padding="20dp"
         android:background="#80000000">
 
+        <!-- Trip Selector Spinner - ADDED -->
+        <Spinner
+            android:id="@+id/tripSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_background"
+            android:padding="10dp"
+            android:layout_marginBottom="10dp"
+            android:popupBackground="#FFFFFF" />
+
+        <!-- New Trip Button - ADDED -->
+        <Button
+            android:id="@+id/newTripButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New Trip"
+            android:layout_marginBottom="10dp" />
+
         <EditText
             android:id="@+id/tripNameInput"
             android:layout_width="match_parent"
@@ -28,7 +46,7 @@
             android:hint="Enter trip name"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp" />
 
         <EditText
@@ -39,7 +57,7 @@
             android:hint="Enter destination"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp" />
 
         <EditText
@@ -51,7 +69,7 @@
             android:hint="Enter budget ($)"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp" />
 
         <EditText
@@ -64,7 +82,7 @@
             android:clickable="true"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp" />
 
         <EditText
@@ -77,17 +95,15 @@
             android:clickable="true"
             android:background="@drawable/edittext_background"
             android:textAlignment="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp" />
-
-
 
         <Button
             android:id="@+id/saveTripButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save Trip Details"
-            android:layout_marginTop="140dp"/>
+            android:layout_marginTop="20dp"/>
 
         <Button
             android:id="@+id/goBackButton"

@@ -36,6 +36,10 @@
         <activity android:name=".SummaryActivity"
             android:label="@string/activity4"/>
 
+        <activity
+            android:name=".TripDetailViewActivity"
+            android:exported="false" />
+
 
     </application>
 
