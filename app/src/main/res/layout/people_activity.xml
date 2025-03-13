@@ -22,13 +22,24 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Trip Selector Spinner - ADDED -->
+        <Spinner
+            android:id="@+id/tripSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/spinner_background"
+            android:padding="10dp"
+            android:popupBackground="#FFFFFF" />
+
         <TextView
             android:id="@+id/tripDetailsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingBottom="16dp"
-            android:text="No Trip Details yet"
+            android:text="Select a trip above"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -81,4 +92,4 @@
             android:text="Go Back"
             android:textColor="@color/white" />
     </LinearLayout>
-    </FrameLayout>
+</FrameLayout>

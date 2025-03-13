@@ -20,6 +20,7 @@
         android:gravity="center"
         android:layout_gravity="center">
 
+
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="match_parent"
@@ -30,6 +31,16 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:paddingBottom="16dp" />
+
+        <Spinner
+            android:id="@+id/tripSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/spinner_background"
+            android:padding="10dp"
+            android:popupBackground="#FFFFFF" />
 
         <TextView
             android:id="@+id/summaryTextView"
