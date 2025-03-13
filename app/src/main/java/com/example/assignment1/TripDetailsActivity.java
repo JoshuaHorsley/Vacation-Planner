@@ -3,26 +3,28 @@ package com.example.assignment1;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import java.util.Calendar;
+
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
-    private SharedPreferences sharedPreferences;
+    private TripDAO tripDAO;
+    private TripModel currentTrip;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
 
-        sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
+        tripDAO = new TripDAO(this);
 
         tripNameInput = findViewById(R.id.tripNameInput);
         destinationInput = findViewById(R.id.destinationInput);
@@ -89,36 +91,33 @@ public class TripDetailsActivity extends ComponentActivity {
             return;
         }
 
-        // Create trip summary string
-        String tripSummary = "Trip: " + tripName + "\nDestination: " + destination +
-                "\nBudget: $" + budget + "\nDeparture: " + departureDate +
-                "\nReturn: " + returnDate;
+        TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
 
-        // Save to SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("tripName", tripName);
-        editor.putString("destination", destination);
-        editor.putString("budget", budget);
-        editor.putString("departureDate", departureDate);
-        editor.putString("returnDate", returnDate);
-        editor.putString("trip_summary", tripSummary);  // Save summary here
-        editor.apply();
+        if (currentTrip == null) {
+            tripDAO.addTrip(trip);
+            Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            trip.setId(currentTrip.getId());
+            tripDAO.updateTrip(trip);
+            Toast.makeText(this, "Trip updated successfully", Toast.LENGTH_SHORT).show();
+        }
 
-        Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
-
     private void loadSavedTrip() {
-        String tripName = sharedPreferences.getString("tripName", "");
-        String destination = sharedPreferences.getString("destination", "");
-        String budget = sharedPreferences.getString("budget", "");
-        String departureDate = sharedPreferences.getString("departureDate", "");
-        String returnDate = sharedPreferences.getString("returnDate", "");
+        Intent intent = getIntent();
+        int tripId = intent.getIntExtra("tripId", -1);
 
-        tripNameInput.setText(tripName);
-        destinationInput.setText(destination);
-        budgetInput.setText(budget);
-        departureDateInput.setText(departureDate);
-        returnDateInput.setText(returnDate);
+        if (tripId != -1) {
+            currentTrip = tripDAO.getTripById(tripId);
+            if (currentTrip != null) {
+                tripNameInput.setText(currentTrip.getTripName());
+                destinationInput.setText(currentTrip.getDestination());
+                budgetInput.setText(currentTrip.getBudget());
+                departureDateInput.setText(currentTrip.getDepartureDate());
+                returnDateInput.setText(currentTrip.getReturnDate());
+            }
+        }
     }
 }

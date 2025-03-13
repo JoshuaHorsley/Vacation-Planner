@@ -1,21 +1,18 @@
 package com.example.assignment1;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import java.util.List;
 
 public class SummaryActivity extends ComponentActivity {
     private TextView summaryTextView;
     private Button goBackButton;
     private Button saveToFileButton;
+    private TripDAO tripDAO;
+    private PeopleDAO peopleDAO;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,35 +22,22 @@ public class SummaryActivity extends ComponentActivity {
         // Initialize views
         summaryTextView = findViewById(R.id.summaryTextView);
         goBackButton = findViewById(R.id.goBackButton);
-
-        // Load and display trip and people details
-        loadTripAndPeopleDetails();
-
         saveToFileButton = findViewById(R.id.saveToFileButton);
+
+        // Initialize DAOs
+        tripDAO = new TripDAO(this);
+        peopleDAO = new PeopleDAO(this);
+
+        // Open database connections
+        tripDAO.open();
+        peopleDAO.open();
+
+        // Load and display trip details from database
+        loadTripDetails();
 
         // Set up the "Save Trip Details" button
         saveToFileButton.setOnClickListener(v -> {
-            // Retrieve the trip summary from SharedPreferences
-            SharedPreferences sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
-            String tripSummary = sharedPreferences.getString("trip_summary", "No trip details available");
-
-            // Load people list
-            String peopleJson = sharedPreferences.getString("people_list", "[]");
-            StringBuilder peopleDetails = new StringBuilder();
-
-            try {
-                JSONArray jsonArray = new JSONArray(peopleJson);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    peopleDetails.append("- ").append(jsonArray.getString(i)).append("\n");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            // Combine trip details and people list into a single summary
-            String summaryText = tripSummary + "\n\nPeople:\n" + peopleDetails.toString();
-
-            // Save the summary to a file
+            String summaryText = summaryTextView.getText().toString();
             FileUtils.saveTripDetailsToFile(this, summaryText);
         });
 
@@ -61,30 +45,60 @@ public class SummaryActivity extends ComponentActivity {
         goBackButton.setOnClickListener(v -> finish());
     }
 
-    private void loadTripAndPeopleDetails() {
-        // Access SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("TripData", Context.MODE_PRIVATE);
+    private void loadTripDetails() {
+        // Get all trips from the database
+        List<TripModel> tripList = tripDAO.getAllTrips();
 
-        // Load trip details
-        String tripSummary = sharedPreferences.getString("trip_summary", "No trip details available");
+        // Create a formatted string with trip details
+        StringBuilder summaryBuilder = new StringBuilder();
+        summaryBuilder.append("Trip Summary\n\n");
 
-        // Load people list
-        String peopleJson = sharedPreferences.getString("people_list", "[]");
-        StringBuilder peopleDetails = new StringBuilder();
+        if (tripList.isEmpty()) {
+            summaryBuilder.append("No trips available.");
+        } else {
+            for (TripModel trip : tripList) {
+                summaryBuilder.append("Trip: ").append(trip.getTripName()).append("\n");
+                summaryBuilder.append("Destination: ").append(trip.getDestination()).append("\n");
+                summaryBuilder.append("Budget: ").append(trip.getBudget()).append("\n");
+                summaryBuilder.append("Departure: ").append(trip.getDepartureDate()).append("\n");
+                summaryBuilder.append("Return: ").append(trip.getReturnDate()).append("\n");
 
-        try {
-            JSONArray jsonArray = new JSONArray(peopleJson);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                peopleDetails.append("- ").append(jsonArray.getString(i)).append("\n");
+                // Get people associated with this trip
+                List<PeopleModel> peopleList = peopleDAO.getPeopleByTripId(trip.getId());
+
+                if (!peopleList.isEmpty()) {
+                    summaryBuilder.append("\nPeople on this trip:\n");
+                    for (PeopleModel person : peopleList) {
+                        summaryBuilder.append("- ").append(person.getName()).append("\n");
+                    }
+                } else {
+                    summaryBuilder.append("\nNo people added to this trip.\n");
+                }
+
+                summaryBuilder.append("\n-----------------------------------------\n\n");
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
-        // Combine trip details and people list into a single summary
-        String summaryText = tripSummary + "\n\nPeople:\n" + peopleDetails.toString();
-
         // Display the summary in the TextView
-        summaryTextView.setText(summaryText);
+        summaryTextView.setText(summaryBuilder.toString());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when activity resumes
+        loadTripDetails();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Close database connections
+        if (tripDAO != null) {
+            tripDAO.close();
+        }
+        if (peopleDAO != null) {
+            peopleDAO.close();
+        }
     }
 }
