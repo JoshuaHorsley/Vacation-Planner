@@ -13,83 +13,115 @@
         android:contentDescription="Background image" />
 
     <!-- Foreground Layout (Your Content) -->
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="#80000000"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:fillViewport="true">
 
-        <!-- Trip Selector Spinner - ADDED -->
-        <Spinner
-            android:id="@+id/tripSpinner"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/spinner_background"
-            android:padding="10dp"
-            android:popupBackground="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/tripDetailsText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:background="#80000000"
             android:gravity="center"
-            android:paddingBottom="16dp"
-            android:text="Select a trip above"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <EditText
-            android:id="@+id/personNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_background"
-            android:gravity="center"
-            android:hint="Enter person name"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            <!-- Trip Selector Spinner -->
+            <Spinner
+                android:id="@+id/tripSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/spinner_background"
+                android:padding="10dp"
+                android:popupBackground="#FFFFFF" />
 
-        <Button
-            android:id="@+id/addPersonButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/teal_700"
-            android:text="Add Person"
-            android:textColor="@color/white" />
+            <TextView
+                android:id="@+id/tripDetailsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                android:text="Select a trip above"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/peopleListText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="16dp"
-            android:text="People will be listed here"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            <!-- Add Person Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/teal_700"
-            android:text="Save People List"
-            android:textColor="@color/white" />
+                <EditText
+                    android:id="@+id/personNameInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_background"
+                    android:gravity="center"
+                    android:hint="Enter person name"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
 
-        <Button
-            android:id="@+id/goBackButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/sunset_red"
-            android:text="Go Back"
-            android:textColor="@color/white" />
-    </LinearLayout>
+                <Button
+                    android:id="@+id/addPersonButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@color/teal_700"
+                    android:text="Add"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <!-- Textview Label for People List -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="People on this trip:"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="start"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Replace TextView with ListView for people -->
+            <ListView
+                android:id="@+id/peopleListView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#40FFFFFF"
+                android:divider="#66FFFFFF"
+                android:dividerHeight="1dp" />
+
+            <!-- For backward compatibility, keep the text view but make it invisible -->
+            <TextView
+                android:id="@+id/peopleListText"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/teal_700"
+                android:text="Save People List"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/goBackButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/sunset_red"
+                android:text="Go Back"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

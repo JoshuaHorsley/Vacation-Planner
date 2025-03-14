@@ -1,5 +1,6 @@
 package com.example.assignment1;
 
+import android.util.Log;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -123,12 +124,18 @@ public class PeopleDAO {
     }
 
     // Delete a person
-    public void deletePerson(long id) {
-        database.delete(
-                DatabaseHelper.TABLE_PEOPLE,
-                DatabaseHelper.COLUMN_PEOPLE_ID + " = ?",
-                new String[]{String.valueOf(id)}
-        );
+    public boolean deletePerson(long personId) {
+        try {
+            int rowsDeleted = database.delete(
+                    DatabaseHelper.TABLE_PEOPLE,
+                    DatabaseHelper.COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(personId)}
+            );
+            return rowsDeleted > 0;
+        } catch (Exception e) {
+            Log.e("PeopleDAO", "Error deleting person: " + e.getMessage());
+            return false;
+        }
     }
 
     // Delete all people for a specific trip
