@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TripDetailViewActivity extends ComponentActivity {
     private TextView tripDetailsText, peopleListText;
-    private Button editTripButton, addTravelersButton, saveToFileButton, goBackButton;
+    private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton;
 
     private TripDAO tripDAO;
     private PeopleDAO peopleDAO;
@@ -32,6 +32,7 @@ public class TripDetailViewActivity extends ComponentActivity {
         editTripButton = findViewById(R.id.editTripButton);
         addTravelersButton = findViewById(R.id.addTravelersButton);
         saveToFileButton = findViewById(R.id.saveToFileButton);
+        deleteTripButton = findViewById(R.id.deleteTripButton); // New delete button
         goBackButton = findViewById(R.id.goBackButton);
 
         // Initialize DAOs
@@ -69,8 +70,6 @@ public class TripDetailViewActivity extends ComponentActivity {
             startActivity(peopleIntent);
         });
 
-        // Replace the saveToFileButton click listener in TripDetailViewActivity.java with:
-
         saveToFileButton.setOnClickListener(v -> {
             // Show a dialog to name the file
             final EditText input = new EditText(this);
@@ -94,7 +93,49 @@ public class TripDetailViewActivity extends ComponentActivity {
                     .show();
         });
 
+        // Set up delete button click listener
+        deleteTripButton.setOnClickListener(v -> {
+            showDeleteTripConfirmation();
+        });
+
         goBackButton.setOnClickListener(v -> finish());
+    }
+
+    /**
+     * Show a confirmation dialog before deleting the trip
+     */
+    private void showDeleteTripConfirmation() {
+        if (currentTrip == null) return;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Trip")
+                .setMessage("Are you sure you want to delete the trip \"" + currentTrip.getTripName() + "\"? " +
+                        "This will delete all travelers associated with this trip and cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteTrip();
+                })
+                .setNegativeButton("Cancel", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    /**
+     * Delete the current trip and all associated travelers
+     */
+    private void deleteTrip() {
+        // First delete all travelers associated with this trip
+        List<PeopleModel> peopleList = peopleDAO.getPeopleByTripId(tripId);
+        for (PeopleModel person : peopleList) {
+            peopleDAO.deletePerson(person.getId());
+        }
+
+        // Then delete the trip
+        tripDAO.deleteTrip(tripId);
+
+        Toast.makeText(this, "Trip deleted successfully", Toast.LENGTH_SHORT).show();
+
+        // Return to the previous screen
+        finish();
     }
 
     private void loadTripDetails() {

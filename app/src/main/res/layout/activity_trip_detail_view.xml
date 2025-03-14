@@ -20,16 +20,26 @@
         android:padding="16dp"
         android:background="#80000000">
 
-        <TextView
-            android:id="@+id/titleTextView"
+        <!-- Header with title and trip name -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Trip Details"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:textColor="@color/white"
-            android:paddingBottom="16dp" />
+            android:background="#40FFFFFF"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trip Details"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="@color/white" />
+        </LinearLayout>
 
         <!-- Scrollable content for trip details -->
         <ScrollView
@@ -40,79 +50,126 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp"
-                android:background="#40000000">
+                android:orientation="vertical">
 
-                <!-- Trip Details Section -->
-                <TextView
-                    android:id="@+id/tripDetailsText"
+                <!-- Trip Details Section with card-like appearance -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp"
-                    android:paddingBottom="16dp" />
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="#40FFFFFF"
+                    android:layout_marginBottom="12dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#66FFFFFF"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Trip Information"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="8dp" />
 
-                <!-- People List Section -->
-                <TextView
-                    android:id="@+id/peopleListText"
+                    <TextView
+                        android:id="@+id/tripDetailsText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:lineSpacingExtra="6dp" />
+                </LinearLayout>
+
+                <!-- People List Section with card-like appearance -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp" />
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="#40FFFFFF">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Travelers"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/peopleListText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:lineSpacingExtra="6dp" />
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
-        <!-- Buttons at the bottom -->
+        <!-- Buttons at the bottom organized in groups -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="16dp">
 
-            <Button
-                android:id="@+id/editTripButton"
+            <!-- Trip management buttons group -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Edit Trip Details"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/teal_700" />
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
 
-            <Button
-                android:id="@+id/addTravelersButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Add Travelers"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/teal_700"
-                android:layout_marginTop="8dp" />
+                <Button
+                    android:id="@+id/editTripButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Edit Trip"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/teal_700"
+                    android:layout_marginEnd="4dp" />
 
+                <Button
+                    android:id="@+id/addTravelersButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add Travelers"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/teal_700"
+                    android:layout_marginStart="4dp" />
+            </LinearLayout>
+
+            <!-- Save button -->
             <Button
                 android:id="@+id/saveToFileButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Save Details to File"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/teal_700"
-                android:layout_marginTop="8dp" />
+                android:backgroundTint="@color/sunset_orange"
+                android:layout_marginBottom="8dp" />
 
+            <!-- Delete Trip button - now separate -->
+            <Button
+                android:id="@+id/deleteTripButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete Trip"
+                android:textColor="@color/white"
+                android:backgroundTint="#E57373"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Go Back button - now separate -->
             <Button
                 android:id="@+id/goBackButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Go Back to List"
+                android:text="Go Back"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/sunset_red"
-                android:layout_marginTop="8dp" />
+                android:backgroundTint="@color/sunset_red" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
