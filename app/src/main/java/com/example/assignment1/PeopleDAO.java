@@ -128,7 +128,7 @@ public class PeopleDAO {
         try {
             int rowsDeleted = database.delete(
                     DatabaseHelper.TABLE_PEOPLE,
-                    DatabaseHelper.COLUMN_ID + " = ?",
+                    DatabaseHelper.COLUMN_PEOPLE_ID + " = ?",
                     new String[]{String.valueOf(personId)}
             );
             return rowsDeleted > 0;
