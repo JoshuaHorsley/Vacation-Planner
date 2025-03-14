@@ -2,8 +2,10 @@ package com.example.assignment1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.ComponentActivity;
@@ -67,12 +69,29 @@ public class TripDetailViewActivity extends ComponentActivity {
             startActivity(peopleIntent);
         });
 
-        saveToFileButton.setOnClickListener(v -> {
-            String tripDetails = tripDetailsText.getText().toString();
-            String peopleList = peopleListText.getText().toString();
-            String fullSummary = tripDetails + "\n\n" + peopleList;
+        // Replace the saveToFileButton click listener in TripDetailViewActivity.java with:
 
-            FileUtils.saveTripDetailsToFile(this, fullSummary);
+        saveToFileButton.setOnClickListener(v -> {
+            // Show a dialog to name the file
+            final EditText input = new EditText(this);
+            input.setHint("Enter file name (optional)");
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Save Trip Details")
+                    .setView(input)
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        String fileName = input.getText().toString().trim();
+
+                        // Generate the content
+                        String tripContent = tripDetailsText.getText().toString();
+                        String peopleContent = peopleListText.getText().toString();
+                        String fullContent = tripContent + "\n\n" + peopleContent;
+
+                        // Save to file
+                        FileUtils.saveTripDetailsToFile(this, fullContent, fileName);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
         goBackButton.setOnClickListener(v -> finish());

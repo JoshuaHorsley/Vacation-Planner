@@ -74,5 +74,11 @@ public class MainActivity extends ComponentActivity {
 
             Toast.makeText(MainActivity.this, "All saved data cleared!", Toast.LENGTH_SHORT).show();
         });
+
+        Button fileManagerButton = findViewById(R.id.fileManagerButton);
+        fileManagerButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, FileManagerActivity.class);
+            startActivity(intent);
+        });
     }
 }

@@ -67,6 +67,14 @@
             android:text="Clear Cache"
             android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"/>
+
+        <Button
+            android:id="@+id/fileManagerButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trip Files"
+            android:padding="10dp"
+            android:layout_marginTop="10dp" />
     </LinearLayout>
 
 </FrameLayout>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_image"
+        android:contentDescription="Background image" />
+
+    <!-- Foreground Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#80000000">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trip Files"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:paddingBottom="16dp" />
+
+        <!-- List of saved files -->
+        <ListView
+            android:id="@+id/fileListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="#66FFFFFF"
+            android:dividerHeight="1dp"
+            android:background="#40000000" />
+
+        <!-- File content viewer -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="File Content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="#40000000">
+
+            <TextView
+                android:id="@+id/fileContentView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </ScrollView>
+
+        <!-- File management buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/renameButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Rename"
+                android:backgroundTint="@color/teal_700"
+                android:textColor="@color/white"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/deleteButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete"
+                android:backgroundTint="#E57373"
+                android:textColor="@color/white"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/goBackButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go Back"
+            android:backgroundTint="@color/sunset_red"
+            android:textColor="@color/white"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</FrameLayout>
