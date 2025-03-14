@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
@@ -29,8 +30,9 @@ import java.util.Map;
 
 
 public class TripDetailsActivity extends ComponentActivity {
-    private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
-    private Button saveTripButton, goBackButton, newTripButton;
+    private EditText tripNameInput, budgetInput, departureDateInput, returnDateInput;
+    private TextView destinationDisplay;
+    private Button destinationButton, saveTripButton, goBackButton, newTripButton;
     private Spinner tripSpinner;
 
     private TripDAO tripDAO;
@@ -38,6 +40,8 @@ public class TripDetailsActivity extends ComponentActivity {
     private Map<String, Long> tripNameToIdMap;
     private boolean isEditMode = false;
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1001;
+    private String selectedPlaceId;
+    private String selectedPlaceName;
 
 
     @Override
@@ -56,7 +60,8 @@ public class TripDetailsActivity extends ComponentActivity {
         // Initialize views
         tripSpinner = findViewById(R.id.tripSpinner);
         tripNameInput = findViewById(R.id.tripNameInput);
-        destinationInput = findViewById(R.id.destinationInput);
+        destinationDisplay = findViewById(R.id.destinationDisplay);
+        destinationButton = findViewById(R.id.destinationButton);
         budgetInput = findViewById(R.id.budgetInput);
         departureDateInput = findViewById(R.id.departureDateInput);
         returnDateInput = findViewById(R.id.returnDateInput);
@@ -68,7 +73,8 @@ public class TripDetailsActivity extends ComponentActivity {
         departureDateInput.setOnClickListener(v -> showDatePicker(departureDateInput));
         returnDateInput.setOnClickListener(v -> showDatePicker(returnDateInput));
 
-        destinationInput.setOnClickListener(v -> openAutocomplete());
+        // Set up destination button
+        destinationButton.setOnClickListener(v -> openAutocomplete());
 
         // Load trips into the spinner
         loadTripsIntoSpinner();
@@ -143,9 +149,10 @@ public class TripDetailsActivity extends ComponentActivity {
             }
         });
     }
+
     private void openAutocomplete() {
         // Define the fields to request
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
         // Create the intent
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
@@ -162,10 +169,23 @@ public class TripDetailsActivity extends ComponentActivity {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK && data != null) {
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                destinationInput.setText(place.getName()); // Set the selected place
+                selectedPlaceId = place.getId();
+                selectedPlaceName = place.getName();
+
+                // Display the selected place name
+                destinationDisplay.setText(selectedPlaceName);
+
+                // Make the display visible if it was previously invisible
+                if (destinationDisplay.getVisibility() == View.GONE) {
+                    destinationDisplay.setVisibility(View.VISIBLE);
+                }
+
+                // Update the button text to indicate editing option
+                destinationButton.setText("Change Destination");
+
             } else if (resultCode == RESULT_CANCELED) {
                 // User canceled the operation
-                Toast.makeText(this, "Autocomplete canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Destination selection canceled", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -210,7 +230,19 @@ public class TripDetailsActivity extends ComponentActivity {
         currentTrip = tripDAO.getTripById((int) tripId);
         if (currentTrip != null) {
             tripNameInput.setText(currentTrip.getTripName());
-            destinationInput.setText(currentTrip.getDestination());
+
+            // Set the destination display
+            String destination = currentTrip.getDestination();
+            if (destination != null && !destination.isEmpty()) {
+                destinationDisplay.setText(destination);
+                destinationDisplay.setVisibility(View.VISIBLE);
+                destinationButton.setText("Change Destination");
+                selectedPlaceName = destination;
+            } else {
+                destinationDisplay.setVisibility(View.GONE);
+                destinationButton.setText("Select Destination");
+            }
+
             budgetInput.setText(currentTrip.getBudget());
             departureDateInput.setText(currentTrip.getDepartureDate());
             returnDateInput.setText(currentTrip.getReturnDate());
@@ -231,7 +263,11 @@ public class TripDetailsActivity extends ComponentActivity {
 
     private void clearForm() {
         tripNameInput.setText("");
-        destinationInput.setText("");
+        destinationDisplay.setText("");
+        destinationDisplay.setVisibility(View.GONE);
+        destinationButton.setText("Select Destination");
+        selectedPlaceId = null;
+        selectedPlaceName = null;
         budgetInput.setText("");
         departureDateInput.setText("");
         returnDateInput.setText("");
@@ -240,17 +276,21 @@ public class TripDetailsActivity extends ComponentActivity {
 
     private void saveTrip() {
         String tripName = tripNameInput.getText().toString();
-        String destination = destinationInput.getText().toString();
+        String destination = selectedPlaceName;  // Use the selected place name
         String budget = budgetInput.getText().toString();
         String departureDate = departureDateInput.getText().toString();
         String returnDate = returnDateInput.getText().toString();
 
-        if (tripName.isEmpty() || destination.isEmpty() || budget.isEmpty() || departureDate.isEmpty() || returnDate.isEmpty()) {
+        if (tripName.isEmpty() || destination == null || destination.isEmpty() || budget.isEmpty()
+                || departureDate.isEmpty() || returnDate.isEmpty()) {
             Toast.makeText(this, "Please enter all details", Toast.LENGTH_SHORT).show();
             return;
         }
 
         TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
+
+        // Optionally store the place ID as well if your TripModel supports it
+        // trip.setPlaceId(selectedPlaceId);
 
         // Make sure the database is open
         if (!tripDAO.isOpen()) {

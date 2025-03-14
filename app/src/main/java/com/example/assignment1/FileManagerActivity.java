@@ -153,9 +153,11 @@ public class FileManagerActivity extends ComponentActivity {
                 fileNames.add("No saved trip files found");
             }
 
+            // Updated adapter to use the custom trip_list_item layout
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     FileManagerActivity.this,
-                    android.R.layout.simple_list_item_1,
+                    R.layout.trip_list_item,
+                    android.R.id.text1,
                     fileNames
             );
             fileListView.setAdapter(adapter);

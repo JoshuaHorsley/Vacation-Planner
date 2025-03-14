@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,107 +12,234 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-    <!-- Foreground Layout (Your Content) -->
-    <LinearLayout
+    <!-- Main Content ScrollView - allows scrolling on smaller screens -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="20dp"
-        android:background="#80000000">
+        android:fillViewport="true">
 
-        <!-- Trip Selector Spinner - ADDED -->
-        <Spinner
-            android:id="@+id/tripSpinner"
+        <!-- Foreground Layout -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/spinner_background"
-            android:padding="10dp"
-            android:layout_marginBottom="10dp"
-            android:popupBackground="#FFFFFF" />
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="#80000000">
 
-        <!-- New Trip Button - ADDED -->
-        <Button
-            android:id="@+id/newTripButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="New Trip"
-            android:layout_marginBottom="10dp" />
+            <!-- Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trip Details"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
 
-        <EditText
-            android:id="@+id/tripNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Enter trip name"
-            android:background="@drawable/edittext_background"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:padding="10dp" />
+            <!-- Trip Selection Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#40FFFFFF"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
 
-        <EditText
-            android:id="@+id/destinationInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Enter destination"
-            android:background="@drawable/edittext_background"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:padding="10dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Existing Trip"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp" />
 
-        <EditText
-            android:id="@+id/budgetInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:inputType="numberDecimal"
-            android:hint="Enter budget ($)"
-            android:background="@drawable/edittext_background"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:padding="10dp" />
+                <!-- Trip Selector Spinner -->
+                <Spinner
+                    android:id="@+id/tripSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_background"
+                    android:padding="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:popupBackground="#FFFFFF" />
 
-        <EditText
-            android:id="@+id/departureDateInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Select Departure Date"
-            android:focusable="false"
-            android:clickable="true"
-            android:background="@drawable/edittext_background"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:padding="10dp" />
+                <!-- New Trip Button -->
+                <Button
+                    android:id="@+id/newTripButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create New Trip"
+                    android:backgroundTint="@color/teal_700"
+                    android:textColor="@color/white" />
+            </LinearLayout>
 
-        <EditText
-            android:id="@+id/returnDateInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:hint="Select Return Date"
-            android:focusable="false"
-            android:clickable="true"
-            android:background="@drawable/edittext_background"
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:padding="10dp" />
+            <!-- Trip Information Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#40FFFFFF"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/saveTripButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save Trip Details"
-            android:layout_marginTop="20dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Trip Information"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/goBackButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Go Back"
-            android:layout_marginTop="10dp"/>
+                <!-- Trip Name Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E0FFFFFF"
+                    android:layout_marginBottom="8dp">
 
-    </LinearLayout>
+                    <EditText
+                        android:id="@+id/tripNameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="Enter trip name"
+                        android:inputType="text"
+                        android:padding="10dp"
+                        android:background="@null" />
+                </LinearLayout>
 
+                <!-- Destination Selection -->
+                <Button
+                    android:id="@+id/destinationButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Destination"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="@color/sunset_orange"
+                    android:textColor="@color/white" />
+
+                <!-- Destination Display -->
+                <TextView
+                    android:id="@+id/destinationDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:background="@drawable/textview_border"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone" />
+
+                <!-- Budget Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E0FFFFFF"
+                    android:layout_marginBottom="8dp">
+
+                    <EditText
+                        android:id="@+id/budgetInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="Enter budget ($)"
+                        android:inputType="numberDecimal"
+                        android:padding="10dp"
+                        android:background="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Date Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#40FFFFFF"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Travel Dates"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Departure Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_today"
+                        android:layout_gravity="center_vertical"
+                        android:tint="#FFFFFF"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="Calendar icon" />
+
+                    <EditText
+                        android:id="@+id/departureDateInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="Select Departure Date"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:background="@drawable/edittext_background"
+                        android:padding="10dp" />
+                </LinearLayout>
+
+                <!-- Return Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_today"
+                        android:layout_gravity="center_vertical"
+                        android:tint="#FFFFFF"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="Calendar icon" />
+
+                    <EditText
+                        android:id="@+id/returnDateInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="Select Return Date"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:background="@drawable/edittext_background"
+                        android:padding="10dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Action Buttons -->
+            <Button
+                android:id="@+id/saveTripButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save Trip Details"
+                android:backgroundTint="#4CAF50"
+                android:textColor="@color/white"
+                android:layout_marginBottom="10dp"/>
+
+            <Button
+                android:id="@+id/goBackButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Go Back"
+                android:backgroundTint="@color/sunset_red"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
