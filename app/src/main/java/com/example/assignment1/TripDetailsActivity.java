@@ -11,14 +11,22 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.activity.ComponentActivity;
+import androidx.annotation.Nullable;
+
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.activity.ComponentActivity;
-import androidx.annotation.Nullable;
 
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, destinationInput, budgetInput, departureDateInput, returnDateInput;
@@ -29,6 +37,8 @@ public class TripDetailsActivity extends ComponentActivity {
     private TripModel currentTrip;
     private Map<String, Long> tripNameToIdMap;
     private boolean isEditMode = false;
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1001;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,6 +47,11 @@ public class TripDetailsActivity extends ComponentActivity {
 
         tripDAO = new TripDAO(this);
         tripDAO.open();
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "REMOVED_MAPS_API_KEY");
+        }
+        PlacesClient placesClient = Places.createClient(this);
 
         // Initialize views
         tripSpinner = findViewById(R.id.tripSpinner);
@@ -52,6 +67,8 @@ public class TripDetailsActivity extends ComponentActivity {
         // Set up date pickers
         departureDateInput.setOnClickListener(v -> showDatePicker(departureDateInput));
         returnDateInput.setOnClickListener(v -> showDatePicker(returnDateInput));
+
+        destinationInput.setOnClickListener(v -> openAutocomplete());
 
         // Load trips into the spinner
         loadTripsIntoSpinner();
@@ -125,6 +142,32 @@ public class TripDetailsActivity extends ComponentActivity {
                 // Do nothing
             }
         });
+    }
+    private void openAutocomplete() {
+        // Define the fields to request
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
+
+        // Create the intent
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                .build(this);
+
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data != null) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                destinationInput.setText(place.getName()); // Set the selected place
+            } else if (resultCode == RESULT_CANCELED) {
+                // User canceled the operation
+                Toast.makeText(this, "Autocomplete canceled", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void showDatePicker(final EditText dateInput) {
