@@ -64,17 +64,6 @@ public class MainActivity extends ComponentActivity {
             startActivity(intent);
         });
 
-        Button clearCacheButton = findViewById(R.id.clearCacheButton);
-        clearCacheButton.setOnClickListener(view -> {
-            SharedPreferences tripData = getSharedPreferences("TripData", Context.MODE_PRIVATE);
-            SharedPreferences cashedOutTrips = getSharedPreferences("CashedOutTrips", Context.MODE_PRIVATE);
-
-            tripData.edit().clear().apply();
-            cashedOutTrips.edit().clear().apply();
-
-            Toast.makeText(MainActivity.this, "All saved data cleared!", Toast.LENGTH_SHORT).show();
-        });
-
         Button fileManagerButton = findViewById(R.id.fileManagerButton);
         fileManagerButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, FileManagerActivity.class);

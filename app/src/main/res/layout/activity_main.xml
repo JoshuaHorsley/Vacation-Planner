@@ -61,14 +61,6 @@
             android:layout_marginTop="10dp"/>
 
         <Button
-            android:id="@+id/clearCacheButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clear Cache"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"/>
-
-        <Button
             android:id="@+id/fileManagerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
