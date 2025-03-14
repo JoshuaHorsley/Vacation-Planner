@@ -1,6 +1,7 @@
 package com.example.assignment1;
 
 import android.app.AlertDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,110 +42,57 @@ public class FileManagerActivity extends ComponentActivity {
         deleteButton = findViewById(R.id.deleteButton);
         goBackButton = findViewById(R.id.goBackButton);
 
-        // Load saved files
+        // Load saved files asynchronously
         loadSavedFiles();
 
         // Set up list item click listener
-        fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (files != null && position < files.length) {
-                    selectedFilePosition = position;
-                    displayFileContent(files[position].getName());
-                }
+        fileListView.setOnItemClickListener((parent, view, position, id) -> {
+            if (files != null && position < files.length) {
+                selectedFilePosition = position;
+                displayFileContent(files[position].getName());
             }
         });
 
         // Set up rename button click listener
-        renameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
-                    showRenameDialog(files[selectedFilePosition].getName());
-                } else {
-                    Toast.makeText(FileManagerActivity.this, "Please select a file first", Toast.LENGTH_SHORT).show();
-                }
+        renameButton.setOnClickListener(v -> {
+            if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
+                showRenameDialog(files[selectedFilePosition].getName());
+            } else {
+                Toast.makeText(FileManagerActivity.this, "Please select a file first", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Set up delete button click listener
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
-                    showDeleteConfirmationDialog(files[selectedFilePosition].getName());
-                } else {
-                    Toast.makeText(FileManagerActivity.this, "Please select a file first", Toast.LENGTH_SHORT).show();
-                }
+        deleteButton.setOnClickListener(v -> {
+            if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
+                showDeleteConfirmationDialog(files[selectedFilePosition].getName());
+            } else {
+                Toast.makeText(FileManagerActivity.this, "Please select a file first", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Set up go back button click listener
-        goBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        goBackButton.setOnClickListener(v -> finish());
     }
 
     private void loadSavedFiles() {
-        // Get all saved files
-        files = FileUtils.listSavedFiles(this);
-        fileNames.clear();
-
-        if (files != null && files.length > 0) {
-            for (File file : files) {
-                fileNames.add(file.getName());
-            }
-
-            // Display the file names in the ListView
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    fileNames
-            );
-            fileListView.setAdapter(adapter);
-            fileListView.setEnabled(true);
-        } else {
-            // No files found
-            fileNames.add("No saved trip files found");
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    fileNames
-            );
-            fileListView.setAdapter(adapter);
-            fileListView.setEnabled(false);
-            fileContentView.setText("");
-        }
+        new LoadFilesTask().execute();
     }
 
     private void displayFileContent(String fileName) {
-        // Read the file content
         String content = FileUtils.readTextFile(this, fileName);
-
-        if (content != null) {
-            fileContentView.setText(content);
-        } else {
-            fileContentView.setText("Error reading file");
-        }
+        fileContentView.setText(content != null ? content : "Error reading file");
     }
 
     private void showRenameDialog(final String oldFileName) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Rename File");
 
-        // Set up the input
         final EditText input = new EditText(this);
-        // Remove the .txt extension for user input
-        String nameWithoutExt = oldFileName.endsWith(".txt")
-                ? oldFileName.substring(0, oldFileName.length() - 4)
-                : oldFileName;
+        String nameWithoutExt = oldFileName.endsWith(".txt") ? oldFileName.substring(0, oldFileName.length() - 4) : oldFileName;
         input.setText(nameWithoutExt);
         builder.setView(input);
 
-        // Set up the buttons
         builder.setPositiveButton("Rename", (dialog, which) -> {
             String newFileName = input.getText().toString().trim();
             if (newFileName.isEmpty()) {
@@ -161,7 +109,6 @@ public class FileManagerActivity extends ComponentActivity {
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 
@@ -185,5 +132,35 @@ public class FileManagerActivity extends ComponentActivity {
     protected void onResume() {
         super.onResume();
         loadSavedFiles();
+    }
+
+    private class LoadFilesTask extends AsyncTask<Void, Void, File[]> {
+        @Override
+        protected File[] doInBackground(Void... voids) {
+            return FileUtils.listSavedFiles(FileManagerActivity.this);
+        }
+
+        @Override
+        protected void onPostExecute(File[] result) {
+            files = result;
+            fileNames.clear();
+
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    fileNames.add(file.getName());
+                }
+            } else {
+                fileNames.add("No saved trip files found");
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    FileManagerActivity.this,
+                    android.R.layout.simple_list_item_1,
+                    fileNames
+            );
+            fileListView.setAdapter(adapter);
+            fileListView.setEnabled(files != null && files.length > 0);
+            fileContentView.setText("");
+        }
     }
 }
