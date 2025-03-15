@@ -53,6 +53,9 @@
         <activity
             android:name=".FileManagerActivity"
             android:exported="false" />
+        <activity
+            android:name=".WeatherFeedActivity"
+            android:exported="false" />
 
     </application>
 
