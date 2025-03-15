@@ -149,15 +149,15 @@ public class FileManagerActivity extends ComponentActivity {
                 for (File file : files) {
                     fileNames.add(file.getName());
                 }
+                // Start the second AsyncTask to load the content of the first file
+                new ReadFileContentTask(files[0].getName()).execute();
             } else {
                 fileNames.add("No saved trip files found");
             }
 
-            // Updated adapter to use the custom trip_list_item layout
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     FileManagerActivity.this,
-                    R.layout.trip_list_item,
-                    android.R.id.text1,
+                    android.R.layout.simple_list_item_1,
                     fileNames
             );
             fileListView.setAdapter(adapter);
@@ -165,4 +165,24 @@ public class FileManagerActivity extends ComponentActivity {
             fileContentView.setText("");
         }
     }
+
+    // Second AsyncTask for reading file content
+    private class ReadFileContentTask extends AsyncTask<Void, Void, String> {
+        private String fileName;
+
+        public ReadFileContentTask(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            return FileUtils.readTextFile(FileManagerActivity.this, fileName);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            fileContentView.setText(result != null ? result : "Error reading file");
+        }
+    }
+
 }
