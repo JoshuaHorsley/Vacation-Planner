@@ -142,6 +142,15 @@
                     android:layout_marginStart="4dp" />
             </LinearLayout>
 
+            <!-- Weather button -->
+            <Button
+                android:id="@+id/weatherButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Check Weather"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/sunset_orange"
+                android:layout_marginBottom="8dp" />
             <!-- Save button -->
             <Button
                 android:id="@+id/saveToFileButton"

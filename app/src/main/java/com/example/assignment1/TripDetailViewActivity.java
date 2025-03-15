@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TripDetailViewActivity extends ComponentActivity {
     private TextView tripDetailsText, peopleListText;
-    private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton;
+    private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton, weatherButton;
 
     private TripDAO tripDAO;
     private PeopleDAO peopleDAO;
@@ -34,6 +34,7 @@ public class TripDetailViewActivity extends ComponentActivity {
         saveToFileButton = findViewById(R.id.saveToFileButton);
         deleteTripButton = findViewById(R.id.deleteTripButton); // New delete button
         goBackButton = findViewById(R.id.goBackButton);
+        weatherButton = findViewById(R.id.weatherButton);
 
         // Initialize DAOs
         tripDAO = new TripDAO(this);
@@ -91,6 +92,17 @@ public class TripDetailViewActivity extends ComponentActivity {
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
+        });
+
+        weatherButton.setOnClickListener(v -> {
+            if (currentTrip != null && currentTrip.getDestination() != null) {
+                Intent weatherIntent = new Intent(TripDetailViewActivity.this, WeatherFeedActivity.class);
+                weatherIntent.putExtra("destination", currentTrip.getDestination());
+                startActivity(weatherIntent);
+            } else {
+                Toast.makeText(TripDetailViewActivity.this,
+                        "No destination set for this trip", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Set up delete button click listener

@@ -32,7 +32,7 @@ import java.util.Map;
 public class TripDetailsActivity extends ComponentActivity {
     private EditText tripNameInput, budgetInput, departureDateInput, returnDateInput;
     private TextView destinationDisplay;
-    private Button destinationButton, saveTripButton, goBackButton, newTripButton;
+    private Button destinationButton, saveTripButton, goBackButton, newTripButton, weatherButton;
     private Spinner tripSpinner;
 
     private TripDAO tripDAO;
@@ -57,7 +57,6 @@ public class TripDetailsActivity extends ComponentActivity {
         }
         PlacesClient placesClient = Places.createClient(this);
 
-        // Initialize views
         tripSpinner = findViewById(R.id.tripSpinner);
         tripNameInput = findViewById(R.id.tripNameInput);
         destinationDisplay = findViewById(R.id.destinationDisplay);
@@ -69,29 +68,23 @@ public class TripDetailsActivity extends ComponentActivity {
         goBackButton = findViewById(R.id.goBackButton);
         newTripButton = findViewById(R.id.newTripButton);
 
-        // Set up date pickers
         departureDateInput.setOnClickListener(v -> showDatePicker(departureDateInput));
         returnDateInput.setOnClickListener(v -> showDatePicker(returnDateInput));
 
-        // Set up destination button
         destinationButton.setOnClickListener(v -> openAutocomplete());
 
-        // Load trips into the spinner
         loadTripsIntoSpinner();
 
-        // New Trip button to clear form
         newTripButton.setOnClickListener(v -> {
             clearForm();
             isEditMode = false;
             saveTripButton.setText("Save Trip");
-            tripSpinner.setSelection(0); // Select "Create New Trip"
+            tripSpinner.setSelection(0);
         });
 
-        // Set up button click listeners
         saveTripButton.setOnClickListener(v -> saveTrip());
         goBackButton.setOnClickListener(v -> finish());
 
-        // Process intent for trip editing
         Intent intent = getIntent();
         long tripId = intent.getLongExtra("tripId", -1);
         if (tripId != -1) {
@@ -100,22 +93,18 @@ public class TripDetailsActivity extends ComponentActivity {
     }
 
     private void loadTripsIntoSpinner() {
-        // Get all trips from the database
         List<TripModel> tripList = tripDAO.getAllTrips();
         tripNameToIdMap = new HashMap<>();
 
-        // Create a list for the spinner with a prompt as the first item
         List<String> tripNames = new ArrayList<>();
         tripNames.add("Create New Trip");
 
-        // Add trip names to the list and map them to their IDs
         for (TripModel trip : tripList) {
             String tripName = trip.getTripName();
             tripNames.add(tripName);
             tripNameToIdMap.put(tripName, trip.getId());
         }
 
-        // Create an adapter for the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -123,20 +112,16 @@ public class TripDetailsActivity extends ComponentActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Set the adapter to the spinner
         tripSpinner.setAdapter(adapter);
 
-        // Set up spinner selection listener
         tripSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-                    // "Create New Trip" selected
                     clearForm();
                     isEditMode = false;
                     saveTripButton.setText("Save Trip");
                 } else {
-                    // Existing trip selected
                     String selectedTripName = parent.getItemAtPosition(position).toString();
                     long tripId = tripNameToIdMap.get(selectedTripName);
                     loadTripForEditing(tripId);
@@ -145,16 +130,13 @@ public class TripDetailsActivity extends ComponentActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
             }
         });
     }
 
     private void openAutocomplete() {
-        // Define the fields to request
         List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG);
 
-        // Create the intent
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
                 .build(this);
 
@@ -172,19 +154,15 @@ public class TripDetailsActivity extends ComponentActivity {
                 selectedPlaceId = place.getId();
                 selectedPlaceName = place.getName();
 
-                // Display the selected place name
                 destinationDisplay.setText(selectedPlaceName);
 
-                // Make the display visible if it was previously invisible
                 if (destinationDisplay.getVisibility() == View.GONE) {
                     destinationDisplay.setVisibility(View.VISIBLE);
                 }
 
-                // Update the button text to indicate editing option
                 destinationButton.setText("Change Destination");
 
             } else if (resultCode == RESULT_CANCELED) {
-                // User canceled the operation
                 Toast.makeText(this, "Destination selection canceled", Toast.LENGTH_SHORT).show();
             }
         }
@@ -231,7 +209,6 @@ public class TripDetailsActivity extends ComponentActivity {
         if (currentTrip != null) {
             tripNameInput.setText(currentTrip.getTripName());
 
-            // Set the destination display
             String destination = currentTrip.getDestination();
             if (destination != null && !destination.isEmpty()) {
                 destinationDisplay.setText(destination);
@@ -250,7 +227,6 @@ public class TripDetailsActivity extends ComponentActivity {
             isEditMode = true;
             saveTripButton.setText("Update Trip");
 
-            // Pre-select this trip in the spinner
             for (int i = 1; i < tripSpinner.getAdapter().getCount(); i++) {
                 String tripName = tripSpinner.getAdapter().getItem(i).toString();
                 if (tripNameToIdMap.get(tripName) == tripId) {
@@ -273,10 +249,9 @@ public class TripDetailsActivity extends ComponentActivity {
         returnDateInput.setText("");
         currentTrip = null;
     }
-
     private void saveTrip() {
         String tripName = tripNameInput.getText().toString();
-        String destination = selectedPlaceName;  // Use the selected place name
+        String destination = selectedPlaceName;
         String budget = budgetInput.getText().toString();
         String departureDate = departureDateInput.getText().toString();
         String returnDate = returnDateInput.getText().toString();
@@ -289,10 +264,7 @@ public class TripDetailsActivity extends ComponentActivity {
 
         TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
 
-        // Optionally store the place ID as well if your TripModel supports it
-        // trip.setPlaceId(selectedPlaceId);
 
-        // Make sure the database is open
         if (!tripDAO.isOpen()) {
             tripDAO.open();
         }
@@ -310,10 +282,8 @@ public class TripDetailsActivity extends ComponentActivity {
                 isEditMode = true;
                 saveTripButton.setText("Update Trip");
 
-                // Refresh spinner with the new trip
                 loadTripsIntoSpinner();
 
-                // Select the newly created trip
                 for (int i = 1; i < tripSpinner.getAdapter().getCount(); i++) {
                     String name = tripSpinner.getAdapter().getItem(i).toString();
                     if (name.equals(tripName)) {
@@ -326,10 +296,10 @@ public class TripDetailsActivity extends ComponentActivity {
             }
         }
 
-        // Set the result to indicate success
         Intent resultIntent = new Intent();
         setResult(RESULT_OK, resultIntent);
     }
+
 
     @Override
     protected void onResume() {
