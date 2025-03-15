@@ -1,20 +1,38 @@
 package com.example.assignment1;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 public class TripDetailViewActivity extends ComponentActivity {
     private TextView tripDetailsText, peopleListText;
     private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton, weatherButton;
+
+    // Weather widget components
+    private LinearLayout weatherWidgetContainer;
+    private ProgressBar weatherProgressBar;
+    private TextView weatherStatusText, weatherResultsText;
 
     private TripDAO tripDAO;
     private PeopleDAO peopleDAO;
@@ -32,9 +50,15 @@ public class TripDetailViewActivity extends ComponentActivity {
         editTripButton = findViewById(R.id.editTripButton);
         addTravelersButton = findViewById(R.id.addTravelersButton);
         saveToFileButton = findViewById(R.id.saveToFileButton);
-        deleteTripButton = findViewById(R.id.deleteTripButton); // New delete button
+        deleteTripButton = findViewById(R.id.deleteTripButton);
         goBackButton = findViewById(R.id.goBackButton);
         weatherButton = findViewById(R.id.weatherButton);
+
+        // Initialize weather widget components
+        weatherWidgetContainer = findViewById(R.id.weatherWidgetContainer);
+        weatherProgressBar = findViewById(R.id.weatherProgressBar);
+        weatherStatusText = findViewById(R.id.weatherStatusText);
+        weatherResultsText = findViewById(R.id.weatherResultsText);
 
         // Initialize DAOs
         tripDAO = new TripDAO(this);
@@ -85,20 +109,32 @@ public class TripDetailViewActivity extends ComponentActivity {
                         // Generate the content
                         String tripContent = tripDetailsText.getText().toString();
                         String peopleContent = peopleListText.getText().toString();
-                        String fullContent = tripContent + "\n\n" + peopleContent;
+                        String weatherContent = weatherResultsText.getText().toString();
+
+                        StringBuilder fullContent = new StringBuilder();
+                        fullContent.append(tripContent).append("\n\n");
+
+                        // Add weather information if available
+                        if (!weatherContent.isEmpty()) {
+                            fullContent.append("Weather Information:\n").append(weatherContent).append("\n\n");
+                        }
+
+                        fullContent.append(peopleContent);
 
                         // Save to file
-                        FileUtils.saveTripDetailsToFile(this, fullContent, fileName);
+                        FileUtils.saveTripDetailsToFile(this, fullContent.toString(), fileName);
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
         });
 
         weatherButton.setOnClickListener(v -> {
-            if (currentTrip != null && currentTrip.getDestination() != null) {
-                Intent weatherIntent = new Intent(TripDetailViewActivity.this, WeatherFeedActivity.class);
-                weatherIntent.putExtra("destination", currentTrip.getDestination());
-                startActivity(weatherIntent);
+            if (currentTrip != null && currentTrip.getDestination() != null && !currentTrip.getDestination().trim().isEmpty()) {
+                // Show the weather widget container
+                weatherWidgetContainer.setVisibility(View.VISIBLE);
+
+                // Fetch weather data
+                new WeatherDownloadTask().execute(currentTrip.getDestination());
             } else {
                 Toast.makeText(TripDetailViewActivity.this,
                         "No destination set for this trip", Toast.LENGTH_SHORT).show();
@@ -206,6 +242,127 @@ public class TripDetailViewActivity extends ComponentActivity {
         }
         if (peopleDAO != null) {
             peopleDAO.close();
+        }
+    }
+
+    /**
+     * AsyncTask to download weather data
+     */
+    private class WeatherDownloadTask extends AsyncTask<String, Integer, String> {
+        private static final String API_KEY = "REMOVED_WEATHER_API_KEY";
+        private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
+
+        @Override
+        protected void onPreExecute() {
+            weatherResultsText.setText("");
+            weatherStatusText.setText("Fetching weather data...");
+            weatherStatusText.setVisibility(View.VISIBLE);
+            weatherProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String destination = params[0];
+            String urlString = BASE_URL + destination + "&appid=" + API_KEY + "&units=metric";
+
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == 200) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                    reader.close();
+                    return parseWeatherData(result.toString());
+                } else {
+                    return "Failed to get weather data (Code: " + responseCode + ")";
+                }
+            } catch (Exception e) {
+                return "Error fetching weather: " + e.getMessage();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            weatherProgressBar.setVisibility(View.GONE);
+            weatherStatusText.setText("Weather data received!");
+            weatherResultsText.setText(result);
+
+            // Save the weather data in a background thread
+            new SaveWeatherDataTask().execute(result);
+        }
+
+        private String parseWeatherData(String jsonData) {
+            try {
+                JSONObject jsonObject = new JSONObject(jsonData);
+                String cityName = jsonObject.getString("name");
+                JSONObject main = jsonObject.getJSONObject("main");
+                double temp = main.getDouble("temp");
+                String weather = jsonObject.getJSONArray("weather").getJSONObject(0).getString("description");
+
+                return "Weather in " + cityName + ":\n" +
+                        "Temperature: " + temp + "°C\n" +
+                        "Condition: " + weather;
+            } catch (JSONException e) {
+                return "Error parsing weather data";
+            }
+        }
+    }
+
+    /**
+     * AsyncTask to save weather data to a file
+     */
+    private class SaveWeatherDataTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            weatherStatusText.setText("Saving weather data locally...");
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String weatherData = params[0];
+            try {
+                // Make the progress bar actually look like it saved something
+                Thread.sleep(500);
+
+                String filename = "weather_data.txt";
+                try {
+                    FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+                    fos.write(weatherData.getBytes());
+                    fos.close();
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                weatherStatusText.setText("Weather data saved successfully!");
+                Toast.makeText(TripDetailViewActivity.this,
+                        "Weather data saved to local storage", Toast.LENGTH_SHORT).show();
+
+                // Hide status text after a short delay
+                weatherStatusText.postDelayed(() -> {
+                    weatherStatusText.setVisibility(View.GONE);
+                }, 3000);
+            } else {
+                weatherStatusText.setText("Failed to save weather data");
+            }
         }
     }
 }
