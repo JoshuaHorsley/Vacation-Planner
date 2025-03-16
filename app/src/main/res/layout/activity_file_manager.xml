@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background Image -->
+
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-    <!-- Foreground Layout -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,7 +30,7 @@
             android:textColor="@color/white"
             android:paddingBottom="16dp" />
 
-        <!-- List of saved files -->
+
         <ListView
             android:id="@+id/fileListView"
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
             android:dividerHeight="1dp"
             android:background="#40000000" />
 
-        <!-- File content viewer -->
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="8dp" />
 
-        <!-- Improved ScrollView for file content with increased height -->
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -70,7 +70,7 @@
                 android:textSize="16sp" />
         </ScrollView>
 
-        <!-- File management buttons -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

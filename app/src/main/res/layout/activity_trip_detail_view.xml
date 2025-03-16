@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background Image -->
+
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-    <!-- Foreground Layout (Your Content) -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +20,7 @@
         android:padding="16dp"
         android:background="#80000000">
 
-        <!-- Header with title and trip name -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
-        <!-- Scrollable content for trip details -->
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Trip Details Section with card-like appearance -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                         android:lineSpacingExtra="6dp" />
                 </LinearLayout>
 
-                <!-- Weather Widget Section - Initially Invisible -->
+
                 <LinearLayout
                     android:id="@+id/weatherWidgetContainer"
                     android:layout_width="match_parent"
@@ -124,7 +124,7 @@
                         android:lineSpacingExtra="6dp" />
                 </LinearLayout>
 
-                <!-- People List Section with card-like appearance -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -152,14 +152,14 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- Buttons at the bottom organized in groups -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="16dp">
 
-            <!-- Trip management buttons group -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -187,7 +187,7 @@
                     android:layout_marginStart="4dp" />
             </LinearLayout>
 
-            <!-- Weather button -->
+
             <Button
                 android:id="@+id/weatherButton"
                 android:layout_width="match_parent"
@@ -196,7 +196,7 @@
                 android:textColor="@color/white"
                 android:backgroundTint="@color/sunset_orange"
                 android:layout_marginBottom="8dp" />
-            <!-- Save button -->
+
             <Button
                 android:id="@+id/saveToFileButton"
                 android:layout_width="match_parent"
@@ -206,7 +206,7 @@
                 android:backgroundTint="@color/sunset_orange"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Delete Trip button - now separate -->
+
             <Button
                 android:id="@+id/deleteTripButton"
                 android:layout_width="match_parent"
@@ -216,7 +216,7 @@
                 android:backgroundTint="#E57373"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Go Back button - now separate -->
+
             <Button
                 android:id="@+id/goBackButton"
                 android:layout_width="match_parent"

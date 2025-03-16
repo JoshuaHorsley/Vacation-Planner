@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background Image -->
+
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -12,13 +12,13 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-    <!-- Main Content ScrollView - allows scrolling on smaller screens -->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <!-- Foreground Layout -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
             android:padding="20dp"
             android:background="#80000000">
 
-            <!-- Title -->
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:gravity="center"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Trip Selection Section -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="8dp" />
 
-                <!-- Trip Selector Spinner -->
+
                 <Spinner
                     android:id="@+id/tripSpinner"
                     android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                     android:layout_marginBottom="10dp"
                     android:popupBackground="#FFFFFF" />
 
-                <!-- New Trip Button -->
+
                 <Button
                     android:id="@+id/newTripButton"
                     android:layout_width="match_parent"
@@ -74,7 +74,7 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
-            <!-- Trip Information Section -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="8dp" />
 
-                <!-- Trip Name Input -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                         android:background="@null" />
                 </LinearLayout>
 
-                <!-- Destination Selection -->
+
                 <Button
                     android:id="@+id/destinationButton"
                     android:layout_width="match_parent"
@@ -119,7 +119,7 @@
                     android:backgroundTint="@color/sunset_orange"
                     android:textColor="@color/white" />
 
-                <!-- Destination Display -->
+
                 <TextView
                     android:id="@+id/destinationDisplay"
                     android:layout_width="match_parent"
@@ -130,7 +130,7 @@
                     android:layout_marginBottom="8dp"
                     android:visibility="gone" />
 
-                <!-- Budget Input -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -149,7 +149,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Date Section -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="8dp" />
 
-                <!-- Departure Date -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
                         android:padding="10dp" />
                 </LinearLayout>
 
-                <!-- Return Date -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -222,7 +222,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Action Buttons -->
+
             <Button
                 android:id="@+id/saveTripButton"
                 android:layout_width="match_parent"

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background Image -->
+
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-    <!-- Foreground Layout (Your Content) -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -33,7 +33,7 @@
             android:textColor="@color/white"
             android:paddingBottom="16dp" />
 
-        <!-- ListView for trips -->
+
         <ListView
             android:id="@+id/tripsListView"
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             android:dividerHeight="1dp"
             android:background="#40000000" />
 
-        <!-- Text shown when no trips available -->
+
         <TextView
             android:id="@+id/noTripsTextView"
             android:layout_width="match_parent"

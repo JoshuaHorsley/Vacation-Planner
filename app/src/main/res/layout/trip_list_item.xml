@@ -7,7 +7,7 @@
     android:paddingStart="8dp"
     android:paddingEnd="0dp">
 
-    <!-- Accent color strip -->
+
     <View
         android:layout_width="4dp"
         android:layout_height="match_parent"
