@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "tripPlanner.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2; // Increment version number
 
     // Trip table
     public static final String TABLE_TRIPS = "trips";
@@ -16,6 +16,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DESTINATION = "destination";
     public static final String COLUMN_START_DATE = "start_date";
     public static final String COLUMN_END_DATE = "end_date";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
 
     // People table
     public static final String TABLE_PEOPLE = "people";
@@ -30,7 +32,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_BUDGET + " TEXT, " +
                     COLUMN_DESTINATION + " TEXT, " +
                     COLUMN_START_DATE + " TEXT, " +
-                    COLUMN_END_DATE + " TEXT);";
+                    COLUMN_END_DATE + " TEXT, " +
+                    COLUMN_LATITUDE + " REAL DEFAULT 0, " +
+                    COLUMN_LONGITUDE + " REAL DEFAULT 0);";
 
     private static final String PEOPLE_TABLE_CREATE =
             "CREATE TABLE " + TABLE_PEOPLE + " (" +
@@ -52,8 +56,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PEOPLE);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRIPS);
-        onCreate(db);
+        if (oldVersion < 2) {
+            // Add latitude and longitude columns to the trips table if upgrading from version 1
+            db.execSQL("ALTER TABLE " + TABLE_TRIPS + " ADD COLUMN " + COLUMN_LATITUDE + " REAL DEFAULT 0");
+            db.execSQL("ALTER TABLE " + TABLE_TRIPS + " ADD COLUMN " + COLUMN_LONGITUDE + " REAL DEFAULT 0");
+        } else {
+            // If there are other major changes, recreate the tables
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PEOPLE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRIPS);
+            onCreate(db);
+        }
     }
 }

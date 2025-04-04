@@ -8,6 +8,8 @@ public class TripModel {
     private String budget;
     private String departureDate;
     private String returnDate;
+    private double latitude;
+    private double longitude;
 
     // Constructor
     public TripModel(String tripName, String destination, String budget, String departureDate, String returnDate) {
@@ -16,6 +18,17 @@ public class TripModel {
         this.budget = budget;
         this.departureDate = departureDate;
         this.returnDate = returnDate;
+    }
+
+    // New constructor with coordinates
+    public TripModel(String tripName, String destination, String budget, String departureDate, String returnDate, double latitude, double longitude) {
+        this.tripName = tripName;
+        this.destination = destination;
+        this.budget = budget;
+        this.departureDate = departureDate;
+        this.returnDate = returnDate;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     // Getters and Setters
@@ -65,5 +78,21 @@ public class TripModel {
 
     public void setReturnDate(String returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

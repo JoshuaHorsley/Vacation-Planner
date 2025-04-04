@@ -36,6 +36,8 @@ public class TripDAO {
         values.put(DatabaseHelper.COLUMN_BUDGET, trip.getBudget());
         values.put(DatabaseHelper.COLUMN_START_DATE, trip.getDepartureDate());
         values.put(DatabaseHelper.COLUMN_END_DATE, trip.getReturnDate());
+        values.put(DatabaseHelper.COLUMN_LATITUDE, trip.getLatitude());
+        values.put(DatabaseHelper.COLUMN_LONGITUDE, trip.getLongitude());
 
         return database.insert(DatabaseHelper.TABLE_TRIPS, null, values);
     }
@@ -61,6 +63,16 @@ public class TripDAO {
                     cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_END_DATE))
             );
             trip.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
+
+            // Get latitude and longitude if these columns exist
+            int latIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_LATITUDE);
+            int longIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_LONGITUDE);
+
+            if (latIndex != -1 && longIndex != -1) {
+                trip.setLatitude(cursor.getDouble(latIndex));
+                trip.setLongitude(cursor.getDouble(longIndex));
+            }
+
             cursor.close();
         }
 
@@ -82,6 +94,16 @@ public class TripDAO {
                         cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_END_DATE))
                 );
                 trip.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
+
+                // Get latitude and longitude if these columns exist
+                int latIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_LATITUDE);
+                int longIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_LONGITUDE);
+
+                if (latIndex != -1 && longIndex != -1) {
+                    trip.setLatitude(cursor.getDouble(latIndex));
+                    trip.setLongitude(cursor.getDouble(longIndex));
+                }
+
                 trips.add(trip);
             } while (cursor.moveToNext());
             cursor.close();
@@ -102,7 +124,14 @@ public class TripDAO {
         values.put(DatabaseHelper.COLUMN_BUDGET, trip.getBudget());
         values.put(DatabaseHelper.COLUMN_START_DATE, trip.getDepartureDate());
         values.put(DatabaseHelper.COLUMN_END_DATE, trip.getReturnDate());
+        values.put(DatabaseHelper.COLUMN_LATITUDE, trip.getLatitude());
+        values.put(DatabaseHelper.COLUMN_LONGITUDE, trip.getLongitude());
 
-        return database.update(DatabaseHelper.TABLE_TRIPS, values, DatabaseHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(trip.getId())});
+        return database.update(
+                DatabaseHelper.TABLE_TRIPS,
+                values,
+                DatabaseHelper.COLUMN_ID + " = ?",
+                new String[]{String.valueOf(trip.getId())}
+        );
     }
 }

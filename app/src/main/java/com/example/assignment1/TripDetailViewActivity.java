@@ -8,12 +8,20 @@ import android.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,9 +33,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-public class TripDetailViewActivity extends ComponentActivity {
+public class TripDetailViewActivity extends ComponentActivity implements OnMapReadyCallback {
     private TextView tripDetailsText, peopleListText;
     private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton, weatherButton;
+
+    // Map view
+    private FrameLayout mapContainer;
+    private MapView mapView;
+    private GoogleMap googleMap;
 
     // Weather widget components
     private LinearLayout weatherWidgetContainer;
@@ -39,10 +52,18 @@ public class TripDetailViewActivity extends ComponentActivity {
     private long tripId;
     private TripModel currentTrip;
 
+    private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_detail_view);
+
+        // Initialize Bundle for MapView
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
+        }
 
         // Initialize views
         tripDetailsText = findViewById(R.id.tripDetailsText);
@@ -53,6 +74,12 @@ public class TripDetailViewActivity extends ComponentActivity {
         deleteTripButton = findViewById(R.id.deleteTripButton);
         goBackButton = findViewById(R.id.goBackButton);
         weatherButton = findViewById(R.id.weatherButton);
+
+        // Initialize map components
+        mapContainer = findViewById(R.id.mapContainer);
+        mapView = findViewById(R.id.mapView);
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
 
         // Initialize weather widget components
         weatherWidgetContainer = findViewById(R.id.weatherWidgetContainer);
@@ -149,6 +176,43 @@ public class TripDetailViewActivity extends ComponentActivity {
         goBackButton.setOnClickListener(v -> finish());
     }
 
+    @Override
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+
+        // Set default map settings
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // If trip has coordinates, show the map
+        if (currentTrip != null && currentTrip.getLatitude() != 0 && currentTrip.getLongitude() != 0) {
+            showTripLocationOnMap();
+        } else {
+            // Hide the map container if no valid coordinates
+            mapContainer.setVisibility(View.GONE);
+        }
+    }
+
+    private void showTripLocationOnMap() {
+        if (googleMap != null && currentTrip != null) {
+            // Create LatLng from the trip coordinates
+            LatLng location = new LatLng(currentTrip.getLatitude(), currentTrip.getLongitude());
+
+            // Clear any existing markers
+            googleMap.clear();
+
+            // Add marker for the trip destination
+            googleMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(currentTrip.getDestination()));
+
+            // Move camera to the location with zoom
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12f));
+
+            // Make the map visible
+            mapContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
     /**
      * Show a confirmation dialog before deleting the trip
      */
@@ -198,8 +262,14 @@ public class TripDetailViewActivity extends ComponentActivity {
             details.append("Return Date: ").append(currentTrip.getReturnDate());
 
             tripDetailsText.setText(details.toString());
+
+            // Show map if coordinates are available
+            if (googleMap != null && currentTrip.getLatitude() != 0 && currentTrip.getLongitude() != 0) {
+                showTripLocationOnMap();
+            }
         } else {
             tripDetailsText.setText("Trip details not available");
+            mapContainer.setVisibility(View.GONE);
         }
     }
 
@@ -218,6 +288,19 @@ public class TripDetailViewActivity extends ComponentActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Bundle mapViewBundle = outState.getBundle(MAP_VIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle);
+        }
+
+        mapView.onSaveInstanceState(mapViewBundle);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         // Make sure database connections are open
@@ -231,6 +314,26 @@ public class TripDetailViewActivity extends ComponentActivity {
         // Refresh data
         loadTripDetails();
         loadPeopleList();
+
+        mapView.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
     }
 
     @Override
@@ -243,6 +346,14 @@ public class TripDetailViewActivity extends ComponentActivity {
         if (peopleDAO != null) {
             peopleDAO.close();
         }
+
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 
     /**
