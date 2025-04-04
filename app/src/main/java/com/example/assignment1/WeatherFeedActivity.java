@@ -2,6 +2,8 @@ package com.example.assignment1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -22,13 +24,14 @@ import androidx.activity.ComponentActivity;
 
 import java.io.FileOutputStream;
 
-public class WeatherFeedActivity extends ComponentActivity {
+public class WeatherFeedActivity extends ComponentActivity implements NetworkChangeReceiver.NetworkChangeListener {
     private TextView statusText;
     private TextView weatherResultsView;
     private Button downloadButton;
     private Button backButton;
     private ProgressBar progressBar;
     private EditText destinationInput;
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +45,21 @@ public class WeatherFeedActivity extends ComponentActivity {
         progressBar = findViewById(R.id.progressBar);
         destinationInput = findViewById(R.id.destinationInput);
 
+        // Initialize the NetworkChangeReceiver with this activity as the listener
+        networkChangeReceiver = new NetworkChangeReceiver(this);
+
         downloadButton.setOnClickListener(v -> {
-            String destination = destinationInput.getText().toString().trim();
-            if (!destination.isEmpty()) {
-                new WeatherFeedDownloadTask().execute(destination);
+            if (ConnectivityUtils.isNetworkConnected(this)) {
+                String destination = destinationInput.getText().toString().trim();
+                if (!destination.isEmpty()) {
+                    new WeatherFeedDownloadTask().execute(destination);
+                } else {
+                    Toast.makeText(this, "Please enter a destination", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Please enter a destination", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No network connection available. Please connect to the internet.",
+                        Toast.LENGTH_LONG).show();
+                statusText.setText("Error: No network connection. Cannot fetch weather data.");
             }
         });
 
@@ -56,6 +68,51 @@ public class WeatherFeedActivity extends ComponentActivity {
         String destination = getIntent().getStringExtra("destination");
         if (destination != null && !destination.isEmpty()) {
             destinationInput.setText(destination);
+        }
+
+        // Set initial network status
+        updateNetworkStatus(ConnectivityUtils.isNetworkConnected(this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Register the NetworkChangeReceiver
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Unregister the NetworkChangeReceiver to avoid memory leaks
+        try {
+            unregisterReceiver(networkChangeReceiver);
+        } catch (IllegalArgumentException e) {
+            // Receiver not registered exception
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        updateNetworkStatus(isConnected);
+    }
+
+    private void updateNetworkStatus(boolean isConnected) {
+        if (isConnected) {
+            statusText.setText("Ready to download weather data");
+            downloadButton.setEnabled(true);
+            if (ConnectivityUtils.isWifiConnected(this)) {
+                statusText.setText("Connected via WiFi. Ready to download weather data.");
+            } else {
+                statusText.setText("Connected via mobile data. Ready to download weather data.");
+            }
+        } else {
+            statusText.setText("No network connection available. Please connect to the internet.");
+            downloadButton.setEnabled(false);
         }
     }
 
@@ -73,16 +130,31 @@ public class WeatherFeedActivity extends ComponentActivity {
 
         @Override
         protected String doInBackground(String... params) {
+            if (!ConnectivityUtils.isNetworkConnected(WeatherFeedActivity.this)) {
+                return "Network error: No connection available";
+            }
+
             String destination = params[0];
             String urlString = BASE_URL + destination + "&appid=" + API_KEY + "&units=metric";
 
             try {
+                // Simulate progress updates
+                publishProgress(20);
+                Thread.sleep(300);
+
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);
+
+                publishProgress(40);
+                Thread.sleep(200);
+
                 connection.connect();
+
+                publishProgress(60);
+                Thread.sleep(200);
 
                 int responseCode = connection.getResponseCode();
                 if (responseCode == 200) {
@@ -93,6 +165,10 @@ public class WeatherFeedActivity extends ComponentActivity {
                         result.append(line);
                     }
                     reader.close();
+
+                    publishProgress(80);
+                    Thread.sleep(200);
+
                     return parseWeatherData(result.toString());
                 } else {
                     return "Failed to get weather data (Code: " + responseCode + ")";
@@ -103,12 +179,26 @@ public class WeatherFeedActivity extends ComponentActivity {
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            progressBar.setVisibility(View.INVISIBLE);
-            statusText.setText("Weather data received!");
-            weatherResultsView.setText(result);
+        protected void onProgressUpdate(Integer... values) {
+            progressBar.setProgress(values[0]);
+        }
 
-            new SaveWeatherDataTask().execute(result);
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setProgress(100);
+
+            if (result.startsWith("Network error") || result.startsWith("Error fetching") || result.startsWith("Failed to get")) {
+                statusText.setText(result);
+            } else {
+                statusText.setText("Weather data received successfully!");
+                weatherResultsView.setText(result);
+
+                // Save the weather data in a background thread
+                new SaveWeatherDataTask().execute(result);
+            }
+
+            // Hide progress bar after a delay
+            progressBar.postDelayed(() -> progressBar.setVisibility(View.INVISIBLE), 1000);
         }
 
         private String parseWeatherData(String jsonData) {
@@ -117,17 +207,25 @@ public class WeatherFeedActivity extends ComponentActivity {
                 String cityName = jsonObject.getString("name");
                 JSONObject main = jsonObject.getJSONObject("main");
                 double temp = main.getDouble("temp");
+                double tempMin = main.getDouble("temp_min");
+                double tempMax = main.getDouble("temp_max");
+                int humidity = main.getInt("humidity");
                 String weather = jsonObject.getJSONArray("weather").getJSONObject(0).getString("description");
 
-                return "Weather in " + cityName + ":\n" +
+                JSONObject wind = jsonObject.getJSONObject("wind");
+                double windSpeed = wind.getDouble("speed");
+
+                return "Weather in " + cityName + ":\n\n" +
                         "Temperature: " + temp + "°C\n" +
+                        "Min/Max: " + tempMin + "°C / " + tempMax + "°C\n" +
+                        "Humidity: " + humidity + "%\n" +
+                        "Wind Speed: " + windSpeed + " m/s\n" +
                         "Condition: " + weather;
             } catch (JSONException e) {
                 return "Error parsing weather data";
             }
         }
     }
-
 
     private class SaveWeatherDataTask extends AsyncTask<String, Void, Boolean> {
         @Override
@@ -139,7 +237,7 @@ public class WeatherFeedActivity extends ComponentActivity {
         protected Boolean doInBackground(String... params) {
             String weatherData = params[0];
             try {
-                //make the progress bar actually look like it saved something
+                // Make the progress bar actually look like it saved something
                 Thread.sleep(1000);
 
                 String filename = "weather_data.txt";

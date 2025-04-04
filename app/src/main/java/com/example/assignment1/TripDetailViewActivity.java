@@ -2,9 +2,12 @@ package com.example.assignment1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +36,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-public class TripDetailViewActivity extends ComponentActivity implements OnMapReadyCallback {
+public class TripDetailViewActivity extends ComponentActivity implements OnMapReadyCallback, NetworkChangeReceiver.NetworkChangeListener {
+    private static final String TAG = "TripDetailViewActivity";
     private TextView tripDetailsText, peopleListText;
     private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton, weatherButton;
 
@@ -51,6 +55,9 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     private PeopleDAO peopleDAO;
     private long tripId;
     private TripModel currentTrip;
+
+    // Network change receiver
+    private NetworkChangeReceiver networkChangeReceiver;
 
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -86,6 +93,9 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         weatherProgressBar = findViewById(R.id.weatherProgressBar);
         weatherStatusText = findViewById(R.id.weatherStatusText);
         weatherResultsText = findViewById(R.id.weatherResultsText);
+
+        // Initialize the NetworkChangeReceiver with this activity as the listener
+        networkChangeReceiver = new NetworkChangeReceiver(this);
 
         // Initialize DAOs
         tripDAO = new TripDAO(this);
@@ -156,15 +166,26 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         });
 
         weatherButton.setOnClickListener(v -> {
-            if (currentTrip != null && currentTrip.getDestination() != null && !currentTrip.getDestination().trim().isEmpty()) {
-                // Show the weather widget container
-                weatherWidgetContainer.setVisibility(View.VISIBLE);
+            if (NetworkChangeReceiver.isNetworkConnected(this)) {
+                if (currentTrip != null && currentTrip.getDestination() != null && !currentTrip.getDestination().trim().isEmpty()) {
+                    // Show the weather widget container
+                    weatherWidgetContainer.setVisibility(View.VISIBLE);
 
-                // Fetch weather data
-                new WeatherDownloadTask().execute(currentTrip.getDestination());
+                    // Fetch weather data
+                    new WeatherDownloadTask().execute(currentTrip.getDestination());
+                } else {
+                    Toast.makeText(TripDetailViewActivity.this,
+                            "No destination set for this trip", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(TripDetailViewActivity.this,
-                        "No destination set for this trip", Toast.LENGTH_SHORT).show();
+                        "Cannot fetch weather: No network connection", Toast.LENGTH_LONG).show();
+
+                // Show widget container with network error message
+                weatherWidgetContainer.setVisibility(View.VISIBLE);
+                weatherStatusText.setVisibility(View.VISIBLE);
+                weatherProgressBar.setVisibility(View.GONE);
+                weatherStatusText.setText("Network error: Please check your internet connection");
             }
         });
 
@@ -210,6 +231,29 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
 
             // Make the map visible
             mapContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        // Enable or disable the weather button based on network availability
+        if (weatherButton != null) {
+            if (!isConnected) {
+                Log.d(TAG, "Network disconnected, updating UI");
+
+                if (weatherWidgetContainer.getVisibility() == View.VISIBLE) {
+                    weatherStatusText.setVisibility(View.VISIBLE);
+                    weatherStatusText.setText("Network disconnected: Weather updates paused");
+                }
+            } else {
+                Log.d(TAG, "Network connected, updating UI");
+
+                if (weatherWidgetContainer.getVisibility() == View.VISIBLE &&
+                        weatherStatusText.getText().toString().contains("Network")) {
+                    // If we previously showed a network error, offer to retry
+                    weatherStatusText.setText("Network connection restored. Tap 'Check Weather' to retry.");
+                }
+            }
         }
     }
 
@@ -311,6 +355,10 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
             peopleDAO.open();
         }
 
+        // Register the NetworkChangeReceiver
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, intentFilter);
+
         // Refresh data
         loadTripDetails();
         loadPeopleList();
@@ -333,6 +381,15 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Unregister the NetworkChangeReceiver to avoid memory leaks
+        try {
+            unregisterReceiver(networkChangeReceiver);
+        } catch (IllegalArgumentException e) {
+            // Receiver not registered exception
+            Log.e(TAG, "Error unregistering network receiver: " + e.getMessage());
+        }
+
         mapView.onPause();
     }
 
@@ -373,6 +430,10 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
 
         @Override
         protected String doInBackground(String... params) {
+            if (!NetworkChangeReceiver.isNetworkConnected(TripDetailViewActivity.this)) {
+                return "Network error: No connection available";
+            }
+
             String destination = params[0];
             String urlString = BASE_URL + destination + "&appid=" + API_KEY + "&units=metric";
 
@@ -405,11 +466,16 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         @Override
         protected void onPostExecute(String result) {
             weatherProgressBar.setVisibility(View.GONE);
-            weatherStatusText.setText("Weather data received!");
-            weatherResultsText.setText(result);
 
-            // Save the weather data in a background thread
-            new SaveWeatherDataTask().execute(result);
+            if (result.startsWith("Network error") || result.startsWith("Error fetching") || result.startsWith("Failed to get")) {
+                weatherStatusText.setText(result);
+            } else {
+                weatherStatusText.setText("Weather data received!");
+                weatherResultsText.setText(result);
+
+                // Save the weather data in a background thread
+                new SaveWeatherDataTask().execute(result);
+            }
         }
 
         private String parseWeatherData(String jsonData) {
@@ -418,10 +484,15 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
                 String cityName = jsonObject.getString("name");
                 JSONObject main = jsonObject.getJSONObject("main");
                 double temp = main.getDouble("temp");
+                double tempMin = main.getDouble("temp_min");
+                double tempMax = main.getDouble("temp_max");
+                int humidity = main.getInt("humidity");
                 String weather = jsonObject.getJSONArray("weather").getJSONObject(0).getString("description");
 
                 return "Weather in " + cityName + ":\n" +
                         "Temperature: " + temp + "°C\n" +
+                        "Min/Max: " + tempMin + "°C / " + tempMax + "°C\n" +
+                        "Humidity: " + humidity + "%\n" +
                         "Condition: " + weather;
             } catch (JSONException e) {
                 return "Error parsing weather data";
