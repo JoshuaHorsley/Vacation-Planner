@@ -1,10 +1,13 @@
-package com.example.assignment1;
+package com.example.assignment1.database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.assignment1.model.TripModel;
+
 import java.util.ArrayList;
 import java.util.List;
 

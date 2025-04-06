@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.assignment1.utils;
 
 import android.content.Context;
 import android.os.Environment;
@@ -15,7 +15,6 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.List;
 
 public class FileUtils {
     private static final String TAG = "FileUtils";

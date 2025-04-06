@@ -1,10 +1,12 @@
 package com.example.assignment1;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.util.Log;
+
+import com.example.assignment1.receivers.NetworkChangeReceiver;
+import com.example.assignment1.utils.ConnectivityUtils;
 
 /**
  * Application class to handle app-wide functionality.

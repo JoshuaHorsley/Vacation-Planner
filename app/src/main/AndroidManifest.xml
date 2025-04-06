@@ -31,7 +31,7 @@
 
         <!-- Register the NetworkChangeReceiver -->
         <receiver
-            android:name=".NetworkChangeReceiver"
+            android:name=".receivers.NetworkChangeReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
@@ -40,7 +40,7 @@
 
         <!-- Activities remain the same -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activites.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Assignment1">
@@ -50,24 +50,24 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".TripDetailsActivity"
+        <activity android:name=".activites.TripDetailsActivity"
             android:label="@string/activity2"/>
 
-        <activity android:name=".PeopleActivity"
+        <activity android:name=".activites.PeopleActivity"
             android:label="@string/activity3"/>
 
-        <activity android:name=".SummaryActivity"
+        <activity android:name=".activites.SummaryActivity"
             android:label="@string/activity4"/>
 
         <activity
-            android:name=".TripDetailViewActivity"
+            android:name=".activites.TripDetailViewActivity"
             android:exported="false" />
 
         <activity
-            android:name=".FileManagerActivity"
+            android:name=".activites.FileManagerActivity"
             android:exported="false" />
         <activity
-            android:name=".WeatherFeedActivity"
+            android:name=".activites.WeatherFeedActivity"
             android:exported="false" />
 
     </application>

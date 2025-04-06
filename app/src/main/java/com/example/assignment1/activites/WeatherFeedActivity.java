@@ -1,7 +1,6 @@
-package com.example.assignment1;
+package com.example.assignment1.activites;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -21,6 +20,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import androidx.activity.ComponentActivity;
+
+import com.example.assignment1.utils.ConnectivityUtils;
+import com.example.assignment1.receivers.NetworkChangeReceiver;
+import com.example.assignment1.R;
 
 import java.io.FileOutputStream;
 

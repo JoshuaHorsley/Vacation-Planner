@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.assignment1.activites;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,13 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
+import com.example.assignment1.utils.FileUtils;
+import com.example.assignment1.receivers.NetworkChangeReceiver;
+import com.example.assignment1.R;
+import com.example.assignment1.database.PeopleDAO;
+import com.example.assignment1.database.TripDAO;
+import com.example.assignment1.model.PeopleModel;
+import com.example.assignment1.model.TripModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;

@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.assignment1.model;
 
 public class PeopleModel {
     private long id;
