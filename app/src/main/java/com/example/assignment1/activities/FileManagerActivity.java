@@ -1,4 +1,4 @@
-package com.example.assignment1.activites;
+package com.example.assignment1.activities;
 
 import android.app.AlertDialog;
 import android.os.AsyncTask;

@@ -1,4 +1,4 @@
-package com.example.assignment1.activites;
+package com.example.assignment1.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
