@@ -1,5 +1,6 @@
 package com.example.assignment1.activities;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -71,6 +72,10 @@ public class MainActivity extends ComponentActivity {
         fileManagerButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, FileManagerActivity.class);
             startActivity(intent);
+
         });
+
+        Intent updateWidgetIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        sendBroadcast(updateWidgetIntent);
     }
 }

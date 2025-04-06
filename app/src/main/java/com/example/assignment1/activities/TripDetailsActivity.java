@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import com.example.assignment1.R;
 import com.example.assignment1.database.TripDAO;
 import com.example.assignment1.model.TripModel;
+import com.example.assignment1.utils.WidgetUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -353,6 +354,8 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
             long newTripId = tripDAO.addTrip(trip);
             if (newTripId > 0) {
                 Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+                WidgetUtils.updateWidgets(TripDetailsActivity.this);
+
                 trip.setId(newTripId);
                 currentTrip = trip;
                 isEditMode = true;

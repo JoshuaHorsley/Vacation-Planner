@@ -26,6 +26,7 @@ import com.example.assignment1.database.PeopleDAO;
 import com.example.assignment1.database.TripDAO;
 import com.example.assignment1.model.PeopleModel;
 import com.example.assignment1.model.TripModel;
+import com.example.assignment1.utils.WidgetUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -296,6 +297,7 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         tripDAO.deleteTrip(tripId);
 
         Toast.makeText(this, "Trip deleted successfully", Toast.LENGTH_SHORT).show();
+        WidgetUtils.updateWidgets(TripDetailViewActivity.this);
 
         // Return to the previous screen
         finish();
