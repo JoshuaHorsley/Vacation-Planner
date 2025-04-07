@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+    <!-- Background image -->
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:src="@drawable/background_image"
         android:contentDescription="Background image" />
 
-
+    <!-- Main content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,7 +26,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-
+            <!-- Trip selector spinner -->
             <Spinner
                 android:id="@+id/tripSpinner"
                 android:layout_width="match_parent"
@@ -37,6 +37,7 @@
                 android:padding="10dp"
                 android:popupBackground="#FFFFFF" />
 
+            <!-- Trip details text -->
             <TextView
                 android:id="@+id/tripDetailsText"
                 android:layout_width="match_parent"
@@ -47,7 +48,7 @@
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
-
+            <!-- Add person input section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,7 +78,17 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
+            <!-- New button for selecting from contacts -->
+            <Button
+                android:id="@+id/addFromContactsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add From Contacts"
+                android:backgroundTint="@color/sunset_orange"
+                android:textColor="@color/white"
+                android:layout_marginBottom="16dp" />
 
+            <!-- People list section header -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,7 +99,7 @@
                 android:gravity="start"
                 android:layout_marginBottom="8dp"/>
 
-
+            <!-- People list view -->
             <ListView
                 android:id="@+id/peopleListView"
                 android:layout_width="match_parent"
@@ -98,13 +109,14 @@
                 android:divider="#66FFFFFF"
                 android:dividerHeight="1dp" />
 
-
+            <!-- Hidden text view (kept for compatibility) -->
             <TextView
                 android:id="@+id/peopleListText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:visibility="gone" />
 
+            <!-- Bottom buttons -->
             <Button
                 android:id="@+id/saveButton"
                 android:layout_width="match_parent"

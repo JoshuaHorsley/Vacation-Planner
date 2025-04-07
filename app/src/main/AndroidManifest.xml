@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Storage permissions -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -79,6 +80,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/trip_widget_info" />
         </receiver>
+
+        <provider
+            android:name=".TripContentProvider"
+            android:authorities="com.example.assignment1.provider"
+            android:exported="false" />
 
     </application>
 

@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.ComponentActivity;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.assignment1.R;
@@ -20,6 +21,8 @@ import com.example.assignment1.database.PeopleDAO;
 import com.example.assignment1.database.TripDAO;
 import com.example.assignment1.model.PeopleModel;
 import com.example.assignment1.model.TripModel;
+import com.example.assignment1.utils.ContactsUtility;
+import com.example.assignment1.utils.PermissionsUtility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 public class PeopleActivity extends ComponentActivity {
+    private static final String TAG = "PeopleActivity";
+
     private TextView tripDetailsText;
     private EditText personNameInput;
-    private Button addPersonButton, saveButton, goBackButton;
+    private Button addPersonButton, addFromContactsButton, saveButton, goBackButton;
     private Spinner tripSpinner;
     private ListView peopleListView;
 
@@ -55,6 +60,9 @@ public class PeopleActivity extends ComponentActivity {
         saveButton = findViewById(R.id.saveButton);
         goBackButton = findViewById(R.id.goBackButton);
         tripSpinner = findViewById(R.id.tripSpinner);
+
+        // Add the new button for contacts
+        addFromContactsButton = findViewById(R.id.addFromContactsButton);
 
         // Initialize collections
         displayNames = new ArrayList<>();
@@ -107,6 +115,7 @@ public class PeopleActivity extends ComponentActivity {
                     // Enable the add person functionality
                     personNameInput.setEnabled(true);
                     addPersonButton.setEnabled(true);
+                    addFromContactsButton.setEnabled(true);
                 } else {
                     // Clear trip details and disable adding people if no trip is selected
                     tripDetailsText.setText("Please select a trip");
@@ -117,6 +126,7 @@ public class PeopleActivity extends ComponentActivity {
                     // Disable the add person functionality
                     personNameInput.setEnabled(false);
                     addPersonButton.setEnabled(false);
+                    addFromContactsButton.setEnabled(false);
                 }
             }
 
@@ -128,6 +138,10 @@ public class PeopleActivity extends ComponentActivity {
 
         // Set up button click listeners
         addPersonButton.setOnClickListener(view -> addPerson());
+
+        // Add new button for selecting contacts
+        addFromContactsButton.setOnClickListener(view -> showContactsSelection());
+
         saveButton.setOnClickListener(view -> {
             Toast.makeText(this, "All changes saved to database", Toast.LENGTH_SHORT).show();
         });
@@ -136,6 +150,88 @@ public class PeopleActivity extends ComponentActivity {
         // Initially disable the add person functionality until a trip is selected
         personNameInput.setEnabled(false);
         addPersonButton.setEnabled(false);
+        addFromContactsButton.setEnabled(false);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionsUtility.REQUEST_CONTACTS_PERMISSION) {
+            if (PermissionsUtility.handlePermissionResult(requestCode, grantResults)) {
+                // Permission granted, show contacts selection
+                showContactsSelectionDialog();
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Contacts permission is required to select contacts", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /**
+     * Show contact selection dialog to choose contacts to add as travelers
+     */
+    private void showContactsSelection() {
+        if (currentTripId == -1) {
+            Toast.makeText(this, "Please select a trip first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if we have contacts permission
+        if (!PermissionsUtility.hasContactsPermission(this)) {
+            // Request permission
+            PermissionsUtility.requestContactsPermission(this);
+            return;
+        }
+
+        // We have permission, show contacts
+        showContactsSelectionDialog();
+    }
+
+    /**
+     * Show the contacts selection dialog
+     */
+    private void showContactsSelectionDialog() {
+        // Get contacts from the device
+        List<String> contacts = ContactsUtility.getContacts(this);
+
+        if (contacts.isEmpty()) {
+            Toast.makeText(this, "No contacts found on device", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Convert to array for AlertDialog
+        final String[] contactsArray = contacts.toArray(new String[0]);
+
+        // Create dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select a Contact");
+
+        builder.setItems(contactsArray, (dialog, which) -> {
+            String selectedContact = contactsArray[which];
+
+            // Add the contact as a traveler using the content provider
+            boolean success = ContactsUtility.addContactAsTraveler(this, selectedContact, currentTripId);
+
+            if (success) {
+                Toast.makeText(this, selectedContact + " added from contacts!", Toast.LENGTH_SHORT).show();
+                updatePeopleList();
+            } else {
+                // Fallback to direct database access if content provider fails
+                PeopleModel newPerson = new PeopleModel(selectedContact, currentTripId);
+                long personId = peopleDAO.addPerson(newPerson);
+
+                if (personId > 0) {
+                    Toast.makeText(this, selectedContact + " added to the trip!", Toast.LENGTH_SHORT).show();
+                    updatePeopleList();
+                } else {
+                    Toast.makeText(this, "Failed to add contact", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 
     private void loadTripsIntoSpinner() {
@@ -204,17 +300,26 @@ public class PeopleActivity extends ComponentActivity {
             return;
         }
 
-        currentPeopleList = peopleDAO.getPeopleByTripId(currentTripId);
+        // Try to get people using the content provider
+        List<String> travelers = ContactsUtility.getTravelersForTrip(this, currentTripId);
 
-        if (currentPeopleList.isEmpty()) {
-            displayNames.add("No people added to this trip. Tap 'Add' to add someone.");
-        } else {
-            for (int i = 0; i < currentPeopleList.size(); i++) {
-                PeopleModel person = currentPeopleList.get(i);
-                displayNames.add(person.getName());
-                positionToPersonIdMap.put(i, person.getId());
+        // If content provider fails or returns no results, fall back to direct database access
+        if (travelers.isEmpty()) {
+            currentPeopleList = peopleDAO.getPeopleByTripId(currentTripId);
+
+            if (currentPeopleList.isEmpty()) {
+                displayNames.add("No people added to this trip. Tap 'Add' to add someone.");
+            } else {
+                for (int i = 0; i < currentPeopleList.size(); i++) {
+                    PeopleModel person = currentPeopleList.get(i);
+                    displayNames.add(person.getName());
+                    positionToPersonIdMap.put(i, person.getId());
+                }
             }
+        } else {
+            displayNames.addAll(travelers);
         }
+
         peopleAdapter.notifyDataSetChanged();
     }
 
@@ -230,16 +335,25 @@ public class PeopleActivity extends ComponentActivity {
             return;
         }
 
-        // Create and save new person
-        PeopleModel newPerson = new PeopleModel(personName, currentTripId);
-        long personId = peopleDAO.addPerson(newPerson);
+        // Try to add person using content provider first
+        boolean success = ContactsUtility.addContactAsTraveler(this, personName, currentTripId);
 
-        if (personId > 0) {
+        if (success) {
             Toast.makeText(this, personName + " added to the trip!", Toast.LENGTH_SHORT).show();
             personNameInput.setText("");
             updatePeopleList();  // Refresh the list display
         } else {
-            Toast.makeText(this, "Failed to add person", Toast.LENGTH_SHORT).show();
+            // Fallback to direct database access
+            PeopleModel newPerson = new PeopleModel(personName, currentTripId);
+            long personId = peopleDAO.addPerson(newPerson);
+
+            if (personId > 0) {
+                Toast.makeText(this, personName + " added to the trip!", Toast.LENGTH_SHORT).show();
+                personNameInput.setText("");
+                updatePeopleList();  // Refresh the list display
+            } else {
+                Toast.makeText(this, "Failed to add person", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
