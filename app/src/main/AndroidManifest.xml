@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+
     <!-- Add network state permission for broadcast receiver -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
@@ -38,6 +42,8 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".receivers.TripReminderReceiver"/>
+
 
         <!-- Activities remain the same -->
         <activity

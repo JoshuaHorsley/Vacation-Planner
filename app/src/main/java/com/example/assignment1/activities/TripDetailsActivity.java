@@ -1,8 +1,13 @@
 package com.example.assignment1.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,7 +20,10 @@ import android.widget.TextView;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import com.example.assignment1.R;
 import com.example.assignment1.database.TripDAO;
 import com.example.assignment1.model.TripModel;
@@ -31,10 +39,15 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import com.example.assignment1.receivers.TripReminderReceiver;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +77,14 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_details);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+            }
+        }
 
         // Initialize MapView with the saved instance state
         Bundle mapViewBundle = null;
@@ -336,7 +357,6 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
 
         TripModel trip = new TripModel(tripName, destination, budget, departureDate, returnDate);
 
-        // Save coordinates if available
         if (selectedPlaceLatLng != null) {
             trip.setLatitude(selectedPlaceLatLng.latitude);
             trip.setLongitude(selectedPlaceLatLng.longitude);
@@ -345,15 +365,16 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
         if (!tripDAO.isOpen()) {
             tripDAO.open();
         }
-
         if (isEditMode && currentTrip != null) {
             trip.setId(currentTrip.getId());
             tripDAO.updateTrip(trip);
             Toast.makeText(this, "Trip updated successfully", Toast.LENGTH_SHORT).show();
+            scheduleTripReminder(tripName, departureDate);
         } else {
             long newTripId = tripDAO.addTrip(trip);
             if (newTripId > 0) {
                 Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show();
+                scheduleTripReminder(tripName, departureDate);
                 WidgetUtils.updateWidgets(TripDetailsActivity.this);
 
                 trip.setId(newTripId);
@@ -391,6 +412,43 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
 
         mapView.onSaveInstanceState(mapViewBundle);
     }
+
+    private void scheduleTripReminder(String tripName, String departureDate) {
+        String[] parts = departureDate.split("-");
+        Calendar departure = Calendar.getInstance();
+        departure.set(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[2]));
+
+        departure.add(Calendar.DAY_OF_MONTH, -1);
+
+        //DEMONSTRATION:
+        long reminderTime = System.currentTimeMillis() + 10 * 1000; // Demo: 10 seconds from now
+        //ACTUAL CODE:
+        // long reminderTime = departure.getTimeInMillis();
+
+        if (reminderTime < System.currentTimeMillis()) return;
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
+                Toast.makeText(this, "Please allow exact alarms to receive reminders.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        Intent intent = new Intent(this, TripReminderReceiver.class);
+        intent.putExtra("tripName", tripName);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, tripName.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent);
+    }
+
 
     @Override
     protected void onResume() {
