@@ -23,7 +23,6 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     private NetworkChangeListener networkChangeListener;
 
     public NetworkChangeReceiver() {
-        // Default constructor required for BroadcastReceiver
     }
 
     public NetworkChangeReceiver(NetworkChangeListener listener) {
@@ -46,18 +45,12 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 Toast.makeText(context, "No network connection", Toast.LENGTH_SHORT).show();
             }
 
-            // Notify the listener (if set)
             if (networkChangeListener != null) {
                 networkChangeListener.onNetworkConnectionChanged(isConnected);
             }
         }
     }
 
-    /**
-     * Check if the network is currently connected
-     * @param context The application context
-     * @return true if connected, false otherwise
-     */
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);

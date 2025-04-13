@@ -49,12 +49,10 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     private TextView tripDetailsText, peopleListText;
     private Button editTripButton, addTravelersButton, saveToFileButton, deleteTripButton, goBackButton, weatherButton;
 
-    // Map view
     private FrameLayout mapContainer;
     private MapView mapView;
     private GoogleMap googleMap;
 
-    // Weather widget components
     private LinearLayout weatherWidgetContainer;
     private ProgressBar weatherProgressBar;
     private TextView weatherStatusText, weatherResultsText;
@@ -64,7 +62,6 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     private long tripId;
     private TripModel currentTrip;
 
-    // Network change receiver
     private NetworkChangeReceiver networkChangeReceiver;
 
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -74,13 +71,11 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_detail_view);
 
-        // Initialize Bundle for MapView
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
 
-        // Initialize views
         tripDetailsText = findViewById(R.id.tripDetailsText);
         peopleListText = findViewById(R.id.peopleListText);
         editTripButton = findViewById(R.id.editTripButton);
@@ -90,30 +85,24 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         goBackButton = findViewById(R.id.goBackButton);
         weatherButton = findViewById(R.id.weatherButton);
 
-        // Initialize map components
         mapContainer = findViewById(R.id.mapContainer);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
 
-        // Initialize weather widget components
         weatherWidgetContainer = findViewById(R.id.weatherWidgetContainer);
         weatherProgressBar = findViewById(R.id.weatherProgressBar);
         weatherStatusText = findViewById(R.id.weatherStatusText);
         weatherResultsText = findViewById(R.id.weatherResultsText);
 
-        // Initialize the NetworkChangeReceiver with this activity as the listener
         networkChangeReceiver = new NetworkChangeReceiver(this);
 
-        // Initialize DAOs
         tripDAO = new TripDAO(this);
         peopleDAO = new PeopleDAO(this);
 
-        // Open database connections
         tripDAO.open();
         peopleDAO.open();
 
-        // Get tripId from intent
         Intent intent = getIntent();
         tripId = intent.getLongExtra("tripId", -1);
 
@@ -123,11 +112,9 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
             return;
         }
 
-        // Load trip details and people list
         loadTripDetails();
         loadPeopleList();
 
-        // Set up button click listeners
         editTripButton.setOnClickListener(v -> {
             Intent editIntent = new Intent(TripDetailViewActivity.this, TripDetailsActivity.class);
             editIntent.putExtra("tripId", tripId);
@@ -141,7 +128,6 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         });
 
         saveToFileButton.setOnClickListener(v -> {
-            // Show a dialog to name the file
             final EditText input = new EditText(this);
             input.setHint("Enter file name (optional)");
 
@@ -197,7 +183,6 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
             }
         });
 
-        // Set up delete button click listener
         deleteTripButton.setOnClickListener(v -> {
             showDeleteTripConfirmation();
         });
@@ -265,9 +250,7 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         }
     }
 
-    /**
-     * Show a confirmation dialog before deleting the trip
-     */
+
     private void showDeleteTripConfirmation() {
         if (currentTrip == null) return;
 
@@ -283,23 +266,18 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
                 .show();
     }
 
-    /**
-     * Delete the current trip and all associated travelers
-     */
+
     private void deleteTrip() {
-        // First delete all travelers associated with this trip
         List<PeopleModel> peopleList = peopleDAO.getPeopleByTripId(tripId);
         for (PeopleModel person : peopleList) {
             peopleDAO.deletePerson(person.getId());
         }
 
-        // Then delete the trip
         tripDAO.deleteTrip(tripId);
 
         Toast.makeText(this, "Trip deleted successfully", Toast.LENGTH_SHORT).show();
         WidgetUtils.updateWidgets(TripDetailViewActivity.this);
 
-        // Return to the previous screen
         finish();
     }
 
@@ -356,7 +334,6 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     @Override
     protected void onResume() {
         super.onResume();
-        // Make sure database connections are open
         if (!tripDAO.isOpen()) {
             tripDAO.open();
         }
@@ -364,11 +341,9 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
             peopleDAO.open();
         }
 
-        // Register the NetworkChangeReceiver
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkChangeReceiver, intentFilter);
 
-        // Refresh data
         loadTripDetails();
         loadPeopleList();
 
@@ -391,11 +366,9 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     protected void onPause() {
         super.onPause();
 
-        // Unregister the NetworkChangeReceiver to avoid memory leaks
         try {
             unregisterReceiver(networkChangeReceiver);
         } catch (IllegalArgumentException e) {
-            // Receiver not registered exception
             Log.e(TAG, "Error unregistering network receiver: " + e.getMessage());
         }
 
@@ -405,7 +378,6 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Close database connections
         if (tripDAO != null) {
             tripDAO.close();
         }
@@ -422,9 +394,7 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         mapView.onLowMemory();
     }
 
-    /**
-     * AsyncTask to download weather data
-     */
+
     private class WeatherDownloadTask extends AsyncTask<String, Integer, String> {
         private static final String API_KEY = "REMOVED_WEATHER_API_KEY";
         private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
@@ -509,9 +479,7 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
         }
     }
 
-    /**
-     * AsyncTask to save weather data to a file
-     */
+
     private class SaveWeatherDataTask extends AsyncTask<String, Void, Boolean> {
         @Override
         protected void onPreExecute() {

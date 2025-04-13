@@ -48,7 +48,6 @@ public class WeatherFeedActivity extends ComponentActivity implements NetworkCha
         progressBar = findViewById(R.id.progressBar);
         destinationInput = findViewById(R.id.destinationInput);
 
-        // Initialize the NetworkChangeReceiver with this activity as the listener
         networkChangeReceiver = new NetworkChangeReceiver(this);
 
         downloadButton.setOnClickListener(v -> {

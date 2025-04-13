@@ -8,10 +8,7 @@ import android.util.Log;
 import com.example.assignment1.receivers.NetworkChangeReceiver;
 import com.example.assignment1.utils.ConnectivityUtils;
 
-/**
- * Application class to handle app-wide functionality.
- * This class manages global broadcast receivers and other app-wide components.
- */
+
 public class TripPlannerApplication extends Application {
     private static final String TAG = "TripPlannerApplication";
 
@@ -68,18 +65,12 @@ public class TripPlannerApplication extends Application {
         }
     }
 
-    /**
-     * Get the current network connection status
-     * @return true if the device is connected to the internet, false otherwise
-     */
+
     public boolean isNetworkConnected() {
         return isNetworkConnected;
     }
 
-    /**
-     * Get connection type as a user-friendly string
-     * @return a string indicating the type of connection
-     */
+
     public String getConnectionInfo() {
         return ConnectivityUtils.getConnectionType(this);
     }

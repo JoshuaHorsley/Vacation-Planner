@@ -52,23 +52,19 @@ public class PeopleActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.people_activity);
 
-        // Initialize views
         tripDetailsText = findViewById(R.id.tripDetailsText);
         personNameInput = findViewById(R.id.personNameInput);
-        peopleListView = findViewById(R.id.peopleListView); // New ListView
+        peopleListView = findViewById(R.id.peopleListView);
         addPersonButton = findViewById(R.id.addPersonButton);
         saveButton = findViewById(R.id.saveButton);
         goBackButton = findViewById(R.id.goBackButton);
         tripSpinner = findViewById(R.id.tripSpinner);
 
-        // Add the new button for contacts
         addFromContactsButton = findViewById(R.id.addFromContactsButton);
 
-        // Initialize collections
         displayNames = new ArrayList<>();
         positionToPersonIdMap = new HashMap<>();
 
-        // Initialize DAOs
         peopleDAO = new PeopleDAO(this);
         tripDAO = new TripDAO(this);
 
@@ -76,48 +72,41 @@ public class PeopleActivity extends ComponentActivity {
         peopleDAO.open();
         tripDAO.open();
 
-        // Get tripId from intent (if provided)
         Intent intent = getIntent();
         long tripId = intent.getLongExtra("tripId", -1);
         if (tripId != -1) {
             currentTripId = tripId;
         }
 
-        // Set up people list adapter
         peopleAdapter = new ArrayAdapter<>(
                 this,
-                R.layout.trip_list_item, // Use your custom list item
+                R.layout.trip_list_item,
                 android.R.id.text1,
                 displayNames
         );
         peopleListView.setAdapter(peopleAdapter);
 
-        // Set up item click listener for removing people
         peopleListView.setOnItemClickListener((parent, view, position, id) -> {
             if (position >= 0 && position < displayNames.size()) {
                 showRemovePersonDialog(displayNames.get(position), position);
             }
         });
 
-        // Load trips into spinner
         loadTripsIntoSpinner();
 
-        // Set up spinner selection listener
         tripSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) { // Skip the "Select a trip" prompt
+                if (position > 0) {
                     String selectedTripName = parent.getItemAtPosition(position).toString();
                     currentTripId = tripNameToIdMap.get(selectedTripName);
                     loadTripDetails();
                     updatePeopleList();
 
-                    // Enable the add person functionality
                     personNameInput.setEnabled(true);
                     addPersonButton.setEnabled(true);
                     addFromContactsButton.setEnabled(true);
                 } else {
-                    // Clear trip details and disable adding people if no trip is selected
                     tripDetailsText.setText("Please select a trip");
                     displayNames.clear();
                     peopleAdapter.notifyDataSetChanged();
@@ -147,7 +136,6 @@ public class PeopleActivity extends ComponentActivity {
         });
         goBackButton.setOnClickListener(view -> finish());
 
-        // Initially disable the add person functionality until a trip is selected
         personNameInput.setEnabled(false);
         addPersonButton.setEnabled(false);
         addFromContactsButton.setEnabled(false);
@@ -168,9 +156,7 @@ public class PeopleActivity extends ComponentActivity {
         }
     }
 
-    /**
-     * Show contact selection dialog to choose contacts to add as travelers
-     */
+
     private void showContactsSelection() {
         if (currentTripId == -1) {
             Toast.makeText(this, "Please select a trip first", Toast.LENGTH_SHORT).show();
@@ -188,11 +174,8 @@ public class PeopleActivity extends ComponentActivity {
         showContactsSelectionDialog();
     }
 
-    /**
-     * Show the contacts selection dialog
-     */
+
     private void showContactsSelectionDialog() {
-        // Get contacts from the device
         List<String> contacts = ContactsUtility.getContacts(this);
 
         if (contacts.isEmpty()) {
@@ -200,24 +183,20 @@ public class PeopleActivity extends ComponentActivity {
             return;
         }
 
-        // Convert to array for AlertDialog
         final String[] contactsArray = contacts.toArray(new String[0]);
 
-        // Create dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select a Contact");
 
         builder.setItems(contactsArray, (dialog, which) -> {
             String selectedContact = contactsArray[which];
 
-            // Add the contact as a traveler using the content provider
             boolean success = ContactsUtility.addContactAsTraveler(this, selectedContact, currentTripId);
 
             if (success) {
                 Toast.makeText(this, selectedContact + " added from contacts!", Toast.LENGTH_SHORT).show();
                 updatePeopleList();
             } else {
-                // Fallback to direct database access if content provider fails
                 PeopleModel newPerson = new PeopleModel(selectedContact, currentTripId);
                 long personId = peopleDAO.addPerson(newPerson);
 
@@ -235,22 +214,18 @@ public class PeopleActivity extends ComponentActivity {
     }
 
     private void loadTripsIntoSpinner() {
-        // Get all trips from the database
         List<TripModel> tripList = tripDAO.getAllTrips();
         tripNameToIdMap = new HashMap<>();
 
-        // Create a list for the spinner with a prompt as the first item
         List<String> tripNames = new ArrayList<>();
         tripNames.add("Select a trip");
 
-        // Add trip names to the list and map them to their IDs
         for (TripModel trip : tripList) {
             String tripName = trip.getTripName();
             tripNames.add(tripName);
             tripNameToIdMap.put(tripName, trip.getId());
         }
 
-        // Create an adapter for the spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -258,10 +233,8 @@ public class PeopleActivity extends ComponentActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Set the adapter to the spinner
         tripSpinner.setAdapter(adapter);
 
-        // Pre-select the trip if one was passed in the intent
         if (currentTripId != -1) {
             for (int i = 1; i < tripNames.size(); i++) {
                 String tripName = tripNames.get(i);
@@ -300,10 +273,9 @@ public class PeopleActivity extends ComponentActivity {
             return;
         }
 
-        // Try to get people using the content provider
         List<String> travelers = ContactsUtility.getTravelersForTrip(this, currentTripId);
 
-        // If content provider fails or returns no results, fall back to direct database access
+
         if (travelers.isEmpty()) {
             currentPeopleList = peopleDAO.getPeopleByTripId(currentTripId);
 
@@ -341,16 +313,15 @@ public class PeopleActivity extends ComponentActivity {
         if (success) {
             Toast.makeText(this, personName + " added to the trip!", Toast.LENGTH_SHORT).show();
             personNameInput.setText("");
-            updatePeopleList();  // Refresh the list display
+            updatePeopleList();
         } else {
-            // Fallback to direct database access
             PeopleModel newPerson = new PeopleModel(personName, currentTripId);
             long personId = peopleDAO.addPerson(newPerson);
 
             if (personId > 0) {
                 Toast.makeText(this, personName + " added to the trip!", Toast.LENGTH_SHORT).show();
                 personNameInput.setText("");
-                updatePeopleList();  // Refresh the list display
+                updatePeopleList();
             } else {
                 Toast.makeText(this, "Failed to add person", Toast.LENGTH_SHORT).show();
             }
@@ -358,7 +329,6 @@ public class PeopleActivity extends ComponentActivity {
     }
 
     private void showRemovePersonDialog(String personName, int position) {
-        // Don't show dialog for the placeholder text
         if (currentPeopleList == null || currentPeopleList.isEmpty()) {
             return;
         }
@@ -390,7 +360,6 @@ public class PeopleActivity extends ComponentActivity {
     protected void onResume() {
         super.onResume();
 
-        // Make sure database connections are open
         if (!peopleDAO.isOpen()) {
             peopleDAO.open();
         }
@@ -398,7 +367,6 @@ public class PeopleActivity extends ComponentActivity {
             tripDAO.open();
         }
 
-        // Refresh data
         loadTripsIntoSpinner();
         if (currentTripId != -1) {
             updatePeopleList();
@@ -408,7 +376,6 @@ public class PeopleActivity extends ComponentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Close database connections
         if (peopleDAO != null) {
             peopleDAO.close();
         }

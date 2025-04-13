@@ -421,9 +421,9 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
         departure.add(Calendar.DAY_OF_MONTH, -1);
 
         //DEMONSTRATION:
-        long reminderTime = System.currentTimeMillis() + 10 * 1000; // Demo: 10 seconds from now
+        //long reminderTime = System.currentTimeMillis() + 10 * 1000; // Demo: 10 seconds from now
         //ACTUAL CODE:
-        // long reminderTime = departure.getTimeInMillis();
+        long reminderTime = departure.getTimeInMillis();
 
         if (reminderTime < System.currentTimeMillis()) return;
 

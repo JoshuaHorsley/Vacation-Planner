@@ -11,10 +11,7 @@ import android.util.Log;
 
 import com.example.assignment1.database.DatabaseHelper;
 
-/**
- * Content Provider for trip planner application
- * Provides access to trips and people data through a standardized URI interface
- */
+
 public class TripContentProvider extends ContentProvider {
     private static final String TAG = "TripContentProvider";
 

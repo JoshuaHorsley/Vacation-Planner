@@ -36,7 +36,6 @@ public class FileManagerActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_manager);
 
-        // Initialize views
         fileListView = findViewById(R.id.fileListView);
         fileContentView = findViewById(R.id.fileContentView);
         renameButton = findViewById(R.id.renameButton);
@@ -46,11 +45,9 @@ public class FileManagerActivity extends ComponentActivity {
         // Load saved files asynchronously
         loadSavedFiles();
 
-        // Enable vertical scrollbar
         fileListView.setVerticalScrollBarEnabled(true);
         fileListView.setScrollbarFadingEnabled(false);
 
-        // Set up list item click listener
         fileListView.setOnItemClickListener((parent, view, position, id) -> {
             if (files != null && position < files.length) {
                 selectedFilePosition = position;
@@ -58,7 +55,6 @@ public class FileManagerActivity extends ComponentActivity {
             }
         });
 
-        // Set up rename button click listener
         renameButton.setOnClickListener(v -> {
             if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
                 showRenameDialog(files[selectedFilePosition].getName());
@@ -67,7 +63,6 @@ public class FileManagerActivity extends ComponentActivity {
             }
         });
 
-        // Set up delete button click listener
         deleteButton.setOnClickListener(v -> {
             if (selectedFilePosition != -1 && files != null && selectedFilePosition < files.length) {
                 showDeleteConfirmationDialog(files[selectedFilePosition].getName());
@@ -76,7 +71,6 @@ public class FileManagerActivity extends ComponentActivity {
             }
         });
 
-        // Set up go back button click listener
         goBackButton.setOnClickListener(v -> finish());
     }
 

@@ -29,30 +29,24 @@ public class SummaryActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
 
-        // Initialize views
         tripsListView = findViewById(R.id.tripsListView);
         noTripsTextView = findViewById(R.id.noTripsTextView);
         goBackButton = findViewById(R.id.goBackButton);
 
-        // Initialize DAO
         tripDAO = new TripDAO(this);
         tripDAO.open();
 
-        // Load trips into the list view
         loadTripsList();
 
-        // Set up list item click listener
         tripsListView.setOnItemClickListener((parent, view, position, id) -> {
             TripModel selectedTrip = tripList.get(position);
             showTripDetails(selectedTrip);
         });
 
-        // Set up the "Go Back" button to finish the activity
         goBackButton.setOnClickListener(v -> finish());
     }
 
     private void loadTripsList() {
-        // Get all trips from the database
         tripList = tripDAO.getAllTrips();
 
         if (tripList.isEmpty()) {
@@ -65,13 +59,11 @@ public class SummaryActivity extends ComponentActivity {
             tripsListView.setVisibility(View.VISIBLE);
             noTripsTextView.setVisibility(View.GONE);
 
-            // Create a list of trip names for the adapter
             List<String> tripNames = new ArrayList<>();
             for (TripModel trip : tripList) {
                 tripNames.add(trip.getTripName() + " - " + trip.getDestination());
             }
 
-            // Set up the adapter with custom list item layout
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     this,
                     R.layout.trip_list_item,
@@ -83,7 +75,6 @@ public class SummaryActivity extends ComponentActivity {
     }
 
     private void showTripDetails(TripModel trip) {
-        // Start the TripDetailViewActivity to show the details
         Intent intent = new Intent(SummaryActivity.this, TripDetailViewActivity.class);
         intent.putExtra("tripId", trip.getId());
         startActivity(intent);
@@ -92,18 +83,15 @@ public class SummaryActivity extends ComponentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Make sure database is open
         if (!tripDAO.isOpen()) {
             tripDAO.open();
         }
-        // Refresh data when activity resumes
         loadTripsList();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Close database connection
         if (tripDAO != null) {
             tripDAO.close();
         }
