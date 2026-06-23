@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
+import com.example.assignment1.BuildConfig;
 import com.example.assignment1.utils.FileUtils;
 import com.example.assignment1.receivers.NetworkChangeReceiver;
 import com.example.assignment1.R;
@@ -396,7 +397,7 @@ public class TripDetailViewActivity extends ComponentActivity implements OnMapRe
 
 
     private class WeatherDownloadTask extends AsyncTask<String, Integer, String> {
-        private static final String API_KEY = "REMOVED_WEATHER_API_KEY";
+        private static final String API_KEY = BuildConfig.WEATHER_API_KEY;
         private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
 
         @Override

@@ -21,6 +21,7 @@ import java.net.URL;
 
 import androidx.activity.ComponentActivity;
 
+import com.example.assignment1.BuildConfig;
 import com.example.assignment1.utils.ConnectivityUtils;
 import com.example.assignment1.receivers.NetworkChangeReceiver;
 import com.example.assignment1.R;
@@ -119,7 +120,7 @@ public class WeatherFeedActivity extends ComponentActivity implements NetworkCha
     }
 
     private class WeatherFeedDownloadTask extends AsyncTask<String, Integer, String> {
-        private static final String API_KEY = "REMOVED_WEATHER_API_KEY";
+        private static final String API_KEY = BuildConfig.WEATHER_API_KEY;
         private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
 
         @Override

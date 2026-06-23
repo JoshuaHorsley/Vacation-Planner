@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import com.example.assignment1.BuildConfig;
 import com.example.assignment1.R;
 import com.example.assignment1.database.TripDAO;
 import com.example.assignment1.model.TripModel;
@@ -96,7 +97,7 @@ public class TripDetailsActivity extends ComponentActivity implements OnMapReady
         tripDAO.open();
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "REMOVED_MAPS_API_KEY");
+            Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         }
         PlacesClient placesClient = Places.createClient(this);
 
